@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幸运早练 · 课堂工具台</title>
+<style>
+:root{
+  --red:#B3282D; --gold:#D9A441; --gold-dark:#B9862C; --dark:#221A15;
+  --bg:#FFFDF8; --surface:#F7F3EA; --line:#E5DFD3; --text:#2B2620; --muted:#8A8178;
+  --ok:#6B8E23;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--text); overflow-x:hidden;
+}
+button{font-family:inherit; cursor:pointer; border:none; border-radius:10px;}
+button:active{transform:scale(.96);}
+
+/* ── header ── */
+header{
+  background:var(--dark); color:#fff; display:flex; align-items:center; gap:14px;
+  padding:10px 18px; position:sticky; top:0; z-index:50;
+}
+.logo{display:flex; gap:6px;}
+.logo i{width:26px;height:26px;border-radius:50%;display:inline-block;}
+.logo i:nth-child(1){background:var(--gold);}
+.logo i:nth-child(2){background:var(--red);}
+.logo i:nth-child(3){background:var(--gold);opacity:.55;}
+h1{font-size:18px; font-weight:700; letter-spacing:1px; flex:1;}
+h1 small{font-weight:400; opacity:.55; font-size:12px; margin-left:8px; letter-spacing:0;}
+.hbtn{background:transparent; color:#D8D2C8; border:1px solid #514A40; padding:6px 12px; font-size:13px;}
+.hbtn.on{background:var(--gold); color:var(--dark); border-color:var(--gold);}
+
+/* ── tabs ── */
+nav{display:flex; background:var(--dark); padding:0 18px 12px; gap:8px; position:sticky; top:46px; z-index:49;}
+nav button{
+  background:#332B24; color:#C8C0B4; padding:9px 16px; font-size:15px; border-radius:10px 10px 0 0;
+}
+nav button.active{background:var(--bg); color:var(--red); font-weight:700;}
+
+main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── common ── */
+.card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:0 2px 10px rgba(34,26,21,.06);}
+.hint-line{color:var(--muted); font-size:14px; margin-top:10px;}
+.big-btn{
+  background:var(--red); color:#fff; font-size:20px; font-weight:700;
+  padding:14px 30px; border-radius:12px; box-shadow:0 4px 12px rgba(179,40,45,.35);
+}
+.big-btn:disabled{background:#CFC8BC; box-shadow:none; cursor:not-allowed;}
+.big-btn.gold{background:var(--gold); color:var(--dark); box-shadow:0 4px 12px rgba(217,164,65,.4);}
+.ghost-btn{background:var(--surface); color:var(--text); border:1px solid var(--line); padding:10px 18px; font-size:15px;}
+
+/* ═══ Game A ═══ */
+.round-tag{display:inline-block; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px 14px; font-size:14px; color:var(--muted); margin-bottom:8px;}
+.mask-wrap{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:18px 0 6px;}
+.mask-cell{
+  width:74px; height:92px; border-radius:12px; background:var(--surface);
+  border:2px solid var(--gold); display:flex; align-items:center; justify-content:center;
+  font-size:44px; font-weight:800; color:var(--red); transition:all .25s;
+}
+.mask-cell.blank::after{content:"_"; color:var(--gold);}
+.mask-cell.show{animation:pop .4s ease; background:#FDF6E7;}
+@keyframes pop{0%{transform:scale(.3) rotate(-12deg); opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+.word-hint{text-align:center; font-size:26px; font-weight:700; margin:14px 0 2px;}
+.word-sub{text-align:center; color:var(--muted); font-size:15px; min-height:22px;}
+.word-mean{text-align:center; font-size:20px; color:var(--red); font-weight:700; min-height:28px;}
+
+.draw-zone{margin-top:18px; text-align:center;}
+.draw-btns{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+.balls-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; min-height:96px; margin:22px 0 6px; align-items:center;}
+.ball{
+  width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:38px; font-weight:800; color:#fff; background:var(--red);
+  box-shadow:0 6px 14px rgba(34,26,21,.25), inset -6px -8px 14px rgba(0,0,0,.18);
+  animation:drop .45s cubic-bezier(.2,1.4,.4,1);
+}
+.ball:nth-child(even){background:var(--gold); color:var(--dark);}
+@keyframes drop{0%{transform:translateY(-90px) scale(.4); opacity:0;}100%{transform:translateY(0) scale(1); opacity:1;}}
+.slot{width:80px;height:80px;border-radius:50%;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;color:#D5CEC0;font-size:22px;}
+.drawn-count{color:var(--muted); font-size:14px;}
+.read-cmd{text-align:center; font-size:18px; margin-top:14px; color:var(--gold-dark); font-weight:700; min-height:26px;}
+
+/* teacher panel */
+details.teacher{margin-bottom:16px; border:1px dashed var(--line); border-radius:12px; background:var(--surface);}
+details.teacher summary{cursor:pointer; padding:12px 16px; font-weight:700; color:var(--muted); font-size:14px; list-style:none;}
+details.teacher summary::before{content:"⚙ ";}
+details.teacher[open] summary{color:var(--red);}
+.teacher-body{padding:0 16px 16px;}
+.word-bank{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;}
+.word-bank .lv-head{flex-basis:100%; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); font-weight:700; margin-top:4px;}
+.word-bank .lv-head:first-child{margin-top:0;}
+.word-bank .lv-head .rnd{font-size:12px; padding:3px 10px; background:#fff; border:1px solid var(--line); border-radius:999px; color:var(--red); font-weight:400;}
+.word-bank button{background:#fff; border:1px solid var(--line); padding:7px 12px; font-size:14px; border-radius:8px;}
+.word-bank button:hover{border-color:var(--gold); color:var(--red);}
+.word-bank button.cur{background:var(--red); color:#fff; border-color:var(--red);}
+.custom-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.custom-row input{padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:15px; width:150px;}
+.custom-row input.hint-in{width:200px;}
+
+/* ═══ Game B ═══ */
+.gb-wrap{text-align:center; padding:10px 0;}
+.gb-ball{
+  width:230px; height:230px; border-radius:50%; margin:16px auto; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; color:#fff; background:var(--red);
+  box-shadow:0 14px 30px rgba(179,40,45,.4), inset -12px -16px 30px rgba(0,0,0,.2);
+}
+.gb-ball .num{font-size:110px; font-weight:800; line-height:1;}
+.gb-ball .lab{font-size:14px; opacity:.8; letter-spacing:3px; margin-top:4px;}
+.gb-ball.rolling{animation:shake .12s infinite;}
+@keyframes shake{0%{transform:translateX(-3px);}50%{transform:translateX(3px);}100%{transform:translateX(-3px);}}
+.gb-verdict{display:none; margin:14px auto 0; max-width:640px; text-align:left;}
+.gb-verdict.show{display:block;}
+.gb-verdict .row{display:flex; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line); font-size:16px; align-items:baseline;}
+.gb-verdict .row b{min-width:64px; color:var(--red);}
+.gb-verdict .row.win{background:#FDF6E7;}
+
+/* ═══ Scoreboard ═══ */
+.sb-tools{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+.sb-tools .sep{flex:1;}
+.groups{display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px;}
+.g-card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:0 2px 8px rgba(34,26,21,.05);}
+.g-card .top{display:flex; align-items:center; gap:10px;}
+.g-card .gname{font-size:17px; font-weight:700; border-bottom:1px dashed transparent; min-width:60px; outline:none;}
+.g-card .gname:focus{border-bottom-color:var(--gold);}
+.g-card .score{margin-left:auto; font-size:30px; font-weight:800; color:var(--red); transition:transform .15s;}
+.g-card .score.bump{transform:scale(1.25);}
+.g-card .score.neg{color:#777;}
+.quick{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+.quick button{padding:6px 10px; font-size:14px; border-radius:8px; background:var(--surface); border:1px solid var(--line); color:var(--text);}
+.quick button:hover{border-color:var(--gold);}
+.quick button.minus{color:var(--red);}
+.quick button.fund{background:#FDF6E7; border-color:var(--gold); font-weight:700;}
+.logbox{margin-top:18px; font-size:13px; color:var(--muted);}
+.logbox .undo{color:var(--red); margin-left:8px; cursor:pointer; text-decoration:underline;}
+
+/* ═══ Rules ═══ */
+.rule-sec{margin-bottom:22px;}
+.rule-sec h3{font-size:17px; margin-bottom:10px; color:var(--red);}
+table{width:100%; border-collapse:collapse; font-size:15px; background:#fff;}
+th{background:var(--red); color:#fff; padding:9px 12px; text-align:left; font-weight:700;}
+td{padding:9px 12px; border-bottom:1px solid var(--line);}
+tr:nth-child(even) td{background:var(--surface);}
+td.c,th.c{text-align:center;}
+.ticket{
+  max-width:560px; margin:10px auto; border:2px solid var(--gold); border-radius:12px; background:#fff;
+  padding:18px 22px; font-size:16px; line-height:2;
+}
+.ticket b{color:var(--red); letter-spacing:2px; font-size:13px;}
+
+footer{text-align:center; color:var(--muted); font-size:12px; padding:24px;}
+kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; padding:1px 7px; font-size:12px; color:var(--text);}
+@media (max-width:640px){
+  .mask-cell{width:52px;height:66px;font-size:32px;}
+  .ball,.slot{width:56px;height:56px;font-size:26px;}
+  .gb-ball{width:170px;height:170px;} .gb-ball .num{font-size:80px;}
+  nav{top:44px; overflow-x:auto;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><i></i><i></i><i></i></div>
+  <h1>幸运早练<small>彩票里的英语与概率 · 课堂工具台</small></h1>
+  <button class="hbtn" id="sndBtn" title="开奖音效">音效 关</button>
+  <button class="hbtn" id="fsBtn">全屏</button>
+</header>
+
+<nav>
+  <button data-page="pa" class="active">🎱 游戏A · 幸运字母</button>
+  <button data-page="pb">🎰 游戏B · 开奖</button>
+  <button data-page="pc">🏆 计分板</button>
+  <button data-page="pd">📋 规则速查</button>
+</nav>
+
+<main>
+
+<!-- ═══════════ Game A ═══════════ -->
+<section class="page active" id="pa">
+  <details class="teacher" id="teacherPanel">
+    <summary>教师面板（投影前设定单词，学生勿看）</summary>
+    <div class="teacher-body">
+      <div class="word-bank" id="wordBank"></div>
+      <div class="custom-row">
+        <input id="customWord" placeholder="自定义单词 A-Z" maxlength="12" autocomplete="off">
+        <input id="customHint" class="hint-in" placeholder="中文提示，如：梦想（名词）" maxlength="20" autocomplete="off">
+        <button class="ghost-btn" id="customSet">设为当前轮</button>
+      </div>
+      <p class="hint-line">题库共 46 词、按三档难度分组（字母越长越难猜）；推荐三轮玩法：三轮同档由浅入深，或三轮分别抽基础 / 进阶 / 高阶各一。切换单词会自动重置本轮。</p>
+    </div>
+  </details>
+
+  <div class="card">
+    <div class="round-tag" id="roundTag">第 1 轮 · 5 个字母</div>
+    <div class="mask-wrap" id="maskWrap"></div>
+    <div class="word-hint" id="wordHint">提示：幸运的（形容词）</div>
+    <div class="word-mean" id="wordMean"></div>
+    <div class="word-sub" id="wordSub">组内讨论 60 秒：3 个预测字母 + 猜完整单词（说英语加分）</div>
+
+    <div class="draw-zone">
+      <div class="balls-row" id="ballsRow"></div>
+      <div class="drawn-count" id="drawnCount">已抽 0 / 7</div>
+      <div class="draw-btns" style="margin-top:12px;">
+        <button class="big-btn" id="drawBtn">抽 1 个字母（空格）</button>
+        <button class="big-btn gold" id="revealBtn">揭晓单词</button>
+        <button class="ghost-btn" id="resetRoundBtn">重置本轮</button>
+      </div>
+      <div class="read-cmd" id="readCmd"></div>
+      <p class="hint-line">抽字母 = 字母杯；每轮抽 7 个、不放回。判定：对照规则速查页的奖级表举手申报。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ Game B ═══════════ -->
+<section class="page" id="pb">
+  <div class="card gb-wrap">
+    <p style="color:var(--muted);font-size:15px;">数字杯 · 三张卡共用同一次开奖结果 X</p>
+    <div class="gb-ball" id="gbBall"><div class="num" id="gbNum">?</div><div class="lab">THE DRAW</div></div>
+    <button class="big-btn" id="spinBtn">开 奖（空格）</button>
+    <button class="ghost-btn" id="spinResetBtn" style="margin-left:10px;">重置</button>
+    <div class="gb-verdict" id="gbVerdict"></div>
+    <p class="hint-line">开奖后按下方判定领分；建议把各组押卡情况写在黑板，开奖时全班一起喊。</p>
+  </div>
+</section>
+
+<!-- ═══════════ Scoreboard ═══════════ -->
+<section class="page" id="pc">
+  <div class="sb-tools">
+    <button class="ghost-btn" id="fundAll">全体发放开局基金 +10</button>
+    <button class="ghost-btn" id="clearAll">全部清零</button>
+    <span style="color:var(--muted);font-size:14px;">组数</span>
+    <button class="ghost-btn gnum" data-n="6">6</button>
+    <button class="ghost-btn gnum" data-n="8">8</button>
+    <button class="ghost-btn gnum" data-n="10">10</button>
+    <span class="sep"></span>
+    <span style="color:var(--muted);font-size:13px;">自动保存在本机 · 下课记得宣布清零</span>
+  </div>
+  <div class="groups" id="groups"></div>
+  <div class="logbox" id="logBox"></div>
+</section>
+
+<!-- ═══════════ Rules ═══════════ -->
+<section class="page" id="pd">
+  <div class="rule-sec card">
+    <h3>游戏 A · 奖级表（每轮每注 = 一张组票）</h3>
+    <table>
+      <tr><th>奖级</th><th>条件</th><th class="c">分数</th><th class="c">中奖概率</th></tr>
+      <tr><td>特等 Jackpot</td><td>3 字母全中 + 猜对单词</td><td class="c"><b>+12</b></td><td class="c">约 1/74 × 猜对率</td></tr>
+      <tr><td>一等</td><td>3 字母全中</td><td class="c">+6</td><td class="c">1.3%</td></tr>
+      <tr><td>二等</td><td>恰中 2 个字母</td><td class="c">+3</td><td class="c">15.3%</td></tr>
+      <tr><td>三等</td><td>恰中 1 个字母</td><td class="c">+1</td><td class="c">46.0%</td></tr>
+      <tr><td>安慰奖</td><td>全不中</td><td class="c">+0.5</td><td class="c">37.3%</td></tr>
+      <tr><td>附加奖</td><td>猜对单词（不论字母）</td><td class="c">+2</td><td class="c">靠实力</td></tr>
+    </table>
+    <p class="hint-line">安慰奖仿自快乐 8「全不中也中奖」；附加奖仿自竞彩「靠知识不靠运气」；组票共享仿自西班牙十分之一票。</p>
+  </div>
+
+  <div class="rule-sec card">
+    <h3>游戏 B · 三张卡（开奖号 X ∈ 0–9）</h3>
+    <table>
+      <tr><th>卡名</th><th>押法</th><th>中了</th><th>没中</th></tr>
+      <tr><td>卡 1 · 稳稳的幸福</td><td>押大（5–9）或小（0–4）</td><td>赔 1.6 倍</td><td>归零</td></tr>
+      <tr><td>卡 2 · 一夜暴富</td><td>押 0–9 一个具体数字</td><td>赔 5 倍</td><td>归零</td></tr>
+      <tr><td>卡 3 · 全村的希望</td><td>全组共押同一数字（拼整票）</td><td>赔 5 倍组内平分</td><td>与 X 相邻（±1）退一半本金</td></tr>
+    </table>
+    <p class="hint-line">期望值：卡 1 = 0.8、卡 3 = 0.6（押 0/9 为 0.55）、卡 2 = 0.5 —— The house always wins.</p>
+  </div>
+
+  <div class="rule-sec card">
+    <h3>组票票样（学生照此画在草稿纸上即可）</h3>
+    <div class="ticket">
+      <b>LUCKY TICKET</b><br>
+      组名 Group：________________<br>
+      幸运字母 Lucky Letters：1.______ 2.______ 3.______<br>
+      猜词 Word Guess：____________________<br>
+      第____轮　得分：________
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>幸运早练 · 20 分钟跨学科活动课 · 积分下课清零，未满 18 周岁不得购买彩票</footer>
+
+<script>
+/* ───────── state & helpers ───────── */
+const $ = s => document.querySelector(s);
+const WORDS = [
+  /* ── ① 基础热身 · 4–6 字母 ── */
+  {w:"LUCK",    h:"运气（名词）",           tip:"Good luck! 祝你好运", lv:1},
+  {w:"WIN",     h:"赢；获胜（动词）",       tip:"win the game 赢下比赛", lv:1},
+  {w:"GAME",    h:"游戏（名词）",           tip:"play games", lv:1},
+  {w:"STAR",    h:"星；明星（名词）",       tip:"a lucky star 幸运星", lv:1},
+  {w:"GOLD",    h:"金子（名词）",           tip:"gold medal 金牌", lv:1},
+  {w:"COIN",    h:"硬币（名词）",           tip:"flip a coin 抛硬币", lv:1},
+  {w:"RICH",    h:"富有的（形容词）",       tip:"get rich 变富", lv:1},
+  {w:"WISH",    h:"愿望；许愿（名/动词）",  tip:"make a wish 许个愿", lv:1},
+  {w:"HOPE",    h:"希望（名/动词）",        tip:"hope for the best", lv:1},
+  {w:"GIFT",    h:"礼物（名词）",           tip:"a free gift", lv:1},
+  {w:"DREAM",   h:"梦想（名词）",           tip:"dream big 心有多大梦有多大", lv:1},
+  {w:"MONEY",   h:"钱（名词）",             tip:"Time is money.", lv:1},
+  {w:"LUCKY",   h:"幸运的（形容词）",       tip:"luck → lucky，Good luck!", lv:1},
+  {w:"PRIZE",   h:"奖品（名词）",           tip:"win a prize 获奖啦", lv:1},
+  {w:"TICKET",  h:"票（名词）",             tip:"a lottery ticket 一张彩票", lv:1},
+  {w:"HAPPY",   h:"快乐的（形容词）",       tip:"happy → happiness", lv:1},
+  /* ── ② 进阶 · 6–8 字母 ── */
+  {w:"WINNER",  h:"赢家（名词）",           tip:"be a winner", lv:2},
+  {w:"CHANCE",  h:"机会（名词）",           tip:"a chance to win", lv:2},
+  {w:"BONUS",   h:"奖金（名词）",           tip:"year-end bonus 年终奖", lv:2},
+  {w:"WEALTH",  h:"财富（名词）",           tip:"health is wealth", lv:2},
+  {w:"REWARD",  h:"报答；奖赏（名词）",     tip:"reward → rewarding", lv:2},
+  {w:"FORTUNE", h:"财富；运气（名词）",     tip:"good fortune 好运气", lv:2},
+  {w:"MILLION", h:"百万（数词）",           tip:"one in a million 百里挑一", lv:2},
+  {w:"UNLUCKY", h:"倒霉的（形容词）",       tip:"lucky → unlucky", lv:2},
+  {w:"SUCCESS", h:"成功（名词）",           tip:"success → successful", lv:2},
+  {w:"LOTTERY", h:"彩票（名词）",           tip:"win the lottery 中彩票", lv:2},
+  {w:"JACKPOT", h:"头奖（名词）",           tip:"Hit the jackpot! 中头奖！", lv:2},
+  {w:"DRAWING", h:"抽签（名词）",           tip:"the drawing of lots", lv:2},
+  {w:"WINNING", h:"获胜的（形容词）",       tip:"the winning number 中奖号码", lv:2},
+  {w:"DIAMOND", h:"钻石（名词）",           tip:"diamonds are forever", lv:2},
+  {w:"VICTORY", h:"胜利（名词）",           tip:"V for Victory", lv:2},
+  {w:"TREASURE",h:"宝藏（名词）",           tip:"treasure hunt 寻宝", lv:2},
+  /* ── ③ 高阶 · 8 字母以上 ── */
+  {w:"BIRTHDAY",   h:"生日（名词）",         tip:"生日号不会更容易中——概率错觉彩蛋", lv:3},
+  {w:"GAMBLING",   h:"赌博（名词）",         tip:"gamble → gambling", lv:3},
+  {w:"STRATEGY",   h:"策略（名词）",         tip:"a winning strategy", lv:3},
+  {w:"CHAMPION",   h:"冠军（名词）",         tip:"win the championship", lv:3},
+  {w:"FORTUNATE",  h:"幸运的（形容词）",     tip:"fortune → fortunately", lv:3},
+  {w:"LUCKILY",    h:"幸运地（副词）",       tip:"Luckily, no one was hurt.", lv:3},
+  {w:"SUPERSTAR",  h:"超级明星（名词）",     tip:"star → superstar", lv:3},
+  {w:"CONFIDENT",  h:"自信的（形容词）",     tip:"be confident of", lv:3},
+  {w:"FANTASTIC",  h:"极好的（形容词）",     tip:"a fantastic prize", lv:3},
+  {w:"MILLIONAIRE",h:"百万富翁（名词）",     tip:"million → millionaire", lv:3},
+  {w:"PROBABILITY",h:"概率（名词）",         tip:"in all probability 十有八九", lv:3},
+  {w:"PSYCHOLOGY", h:"心理学（名词）",       tip:"consumer psychology 消费心理", lv:3},
+  {w:"INCREDIBLE", h:"难以置信的（形容词）", tip:"an incredible story", lv:3},
+  {w:"ENORMOUS",   h:"巨大的（形容词）",     tip:"enormous ≈ huge", lv:3},
+];
+const LEVELS = [
+  {id:1, name:"① 基础热身 · 4–6 字母 · 初中基础"},
+  {id:2, name:"② 进阶 · 6–8 字母 · 初中高段 / 高一"},
+  {id:3, name:"③ 高阶 · 8 字母以上 · 高中及拓展"},
+];
+const state = {
+  round: 1, cur: WORDS[0], drawn: [], revealed: false,
+  presetIdx: 0,
+};
+
+/* sound */
+let audioOn = false, actx = null;
+function beep(freq, dur=0.09, type="triangle", gain=0.12){
+  if(!audioOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(gain, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + dur);
+  }catch(e){}
+}
+$("#sndBtn").onclick = () => {
+  audioOn = !audioOn;
+  $("#sndBtn").textContent = "音效 " + (audioOn ? "开" : "关");
+  $("#sndBtn").classList.toggle("on", audioOn);
+  if(audioOn) beep(660);
+};
+$("#fsBtn").onclick = () => {
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+};
+
+/* tabs */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(x => x.classList.remove("active"));
+  b.classList.add("active"); $("#" + b.dataset.page).classList.add("active");
+});
+
+/* ───────── Game A ───────── */
+function renderBank(){
+  const box = $("#wordBank"); box.innerHTML = "";
+  LEVELS.forEach(L => {
+    const head = document.createElement("div");
+    head.className = "lv-head";
+    const label = document.createElement("span");
+    label.textContent = L.name;
+    const rnd = document.createElement("button");
+    rnd.className = "rnd";
+    rnd.textContent = "随机一个";
+    rnd.onclick = () => {
+      const pool = WORDS.map((x, i) => ({x, i})).filter(o => o.x.lv === L.id);
+      setWord(pool[Math.floor(Math.random() * pool.length)].i);
+    };
+    head.appendChild(label); head.appendChild(rnd);
+    box.appendChild(head);
+    WORDS.forEach((it, i) => {
+      if(it.lv !== L.id) return;
+      const b = document.createElement("button");
+      b.textContent = it.w;
+      if(state.cur.w === it.w) b.classList.add("cur");
+      b.onclick = () => setWord(i);
+      box.appendChild(b);
+    });
+  });
+}
+function setWord(i){
+  state.cur = WORDS[i]; state.presetIdx = i;
+  resetRound(false);
+  renderBank();
+}
+$("#customSet").onclick = () => {
+  const w = $("#customWord").value.trim().toUpperCase().replace(/[^A-Z]/g,"");
+  const h = $("#customHint").value.trim();
+  if(w.length < 3){ alert("请输入 3–12 个英文字母"); return; }
+  state.cur = {w, h: h || "（自定义单词）", tip:"Read after me!"};
+  resetRound(false); renderBank();
+  $("#customWord").value = ""; $("#customHint").value = "";
+};
+function renderMask(){
+  const wrap = $("#maskWrap"); wrap.innerHTML = "";
+  [...state.cur.w].forEach((ch, i) => {
+    const d = document.createElement("div");
+    d.className = "mask-cell" + (state.revealed ? "" : " blank");
+    if(state.revealed){
+      setTimeout(() => { d.textContent = ch; d.classList.add("show"); beep(520+i*60,.07); }, i*160);
+    }
+    wrap.appendChild(d);
+  });
+  $("#roundTag").textContent = `第 ${state.round} 轮 · ${state.cur.w.length} 个字母`;
+  $("#wordHint").textContent = "提示：" + state.cur.h;
+  $("#wordMean").textContent = state.revealed ? state.cur.w + (/[（(]/.test(state.cur.h) ? "  " + state.cur.h : "") : "";
+  $("#wordSub").textContent = state.revealed
+    ? ""
+    : "组内讨论 60 秒：3 个预测字母 + 猜完整单词（说英语加分）";
+  $("#readCmd").textContent = state.revealed ? "Read after me! 全班齐读两遍 · " + state.cur.tip : "";
+}
+function renderBalls(){
+  const row = $("#ballsRow"); row.innerHTML = "";
+  for(let i = 0; i < 7; i++){
+    if(i < state.drawn.length){
+      const b = document.createElement("div");
+      b.className = "ball"; b.textContent = state.drawn[i];
+      row.appendChild(b);
+    } else {
+      const s = document.createElement("div");
+      s.className = "slot"; s.textContent = i + 1;
+      row.appendChild(s);
+    }
+  }
+  $("#drawnCount").textContent = `已抽 ${state.drawn.length} / 7`;
+  $("#drawBtn").disabled = state.drawn.length >= 7 || state.revealed;
+  $("#revealBtn").disabled = state.revealed;
+}
+function drawLetter(){
+  if(state.drawn.length >= 7 || state.revealed) return;
+  const pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c => !state.drawn.includes(c));
+  const c = pool[Math.floor(Math.random() * pool.length)];
+  state.drawn.push(c);
+  beep(880); renderBalls();
+  if(state.drawn.length === 7){
+    $("#drawBtn").disabled = true;
+    setTimeout(() => beep(523,.12), 200);
+    setTimeout(() => beep(784,.16), 360);
+  }
+}
+function reveal(){
+  if(state.revealed) return;
+  state.revealed = true;
+  [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.14,"sine",.14), i*120));
+  renderMask(); renderBalls();
+}
+function resetRound(bump = true){
+  state.drawn = []; state.revealed = false;
+  if(bump) state.round++;
+  renderMask(); renderBalls();
+  $("#teacherPanel").open = false;
+}
+$("#drawBtn").onclick = drawLetter;
+$("#revealBtn").onclick = reveal;
+$("#resetRoundBtn").onclick = () => resetRound(true);
+
+/* ───────── Game B ───────── */
+let spinning = false;
+function spin(){
+  if(spinning) return;
+  spinning = true;
+  const ball = $("#gbBall"), num = $("#gbNum");
+  ball.classList.add("rolling");
+  $("#gbVerdict").classList.remove("show");
+  const result = Math.floor(Math.random() * 10);
+  let t = 0, delay = 55, elapsed = 0;
+  const total = 2100;
+  (function tick(){
+    num.textContent = Math.floor(Math.random() * 10);
+    beep(300 + Math.random()*80, .03, "square", .05);
+    elapsed += delay;
+    delay = 55 + Math.pow(elapsed / total, 2.6) * 420;
+    if(elapsed < total){ setTimeout(tick, delay); }
+    else{
+      num.textContent = result;
+      ball.classList.remove("rolling");
+      [659,880].forEach((f,i)=>setTimeout(()=>beep(f,.2,"sine",.15), i*130));
+      showVerdict(result);
+      spinning = false;
+    }
+  })();
+}
+function showVerdict(x){
+  const big = x >= 5;
+  const neigh = [x-1, x+1].filter(n => n >= 0 && n <= 9);
+  const v = $("#gbVerdict");
+  v.innerHTML = `
+    <div class="row ${big?"win":""}"><b>卡 1</b><span>开奖 ${x} 属「${big?"大（5–9）":"小（0–4）"}」—— 押${big?"大":"小"}的组：10 分 × 1.6 = <b>16 分</b></span></div>
+    <div class="row"><b>卡 2</b><span>押数字 <b>${x}</b> 的组：10 分 × 5 = <b>50 分</b></span></div>
+    <div class="row"><b>卡 3</b><span>押 <b>${x}</b> 的组：50 分组内平分；押 <b>${neigh.join("、")}</b> 的组：退回一半本金（5 分）</span></div>
+    <div class="row"><b>揭底</b><span>三张卡期望：卡1 = 0.8 · 卡3 = 0.6 · 卡2 = 0.5 —— The house always wins.</span></div>`;
+  v.classList.add("show");
+}
+$("#spinBtn").onclick = spin;
+$("#spinResetBtn").onclick = () => {
+  $("#gbNum").textContent = "?";
+  $("#gbVerdict").classList.remove("show");
+};
+
+/* ───────── Scoreboard ───────── */
+const LS_KEY = "luckyMorningScores";
+let groups = JSON.parse(localStorage.getItem(LS_KEY) || "null") || defaultGroups(6);
+let ops = [];
+function defaultGroups(n){
+  return Array.from({length:n}, (_,i) => ({name:"第 " + (i+1) + " 组", score:0}));
+}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(groups)); }
+function renderGroups(){
+  const box = $("#groups"); box.innerHTML = "";
+  groups.forEach((g, i) => {
+    const card = document.createElement("div");
+    card.className = "g-card";
+    card.innerHTML = `
+      <div class="top">
+        <span class="gname" contenteditable="plaintext-only" spellcheck="false">${g.name}</span>
+        <span class="score ${g.score<0?"neg":""}">${g.score}</span>
+      </div>
+      <div class="quick"></div>`;
+    const nameEl = card.querySelector(".gname");
+    nameEl.addEventListener("blur", () => { groups[i].name = nameEl.textContent.trim() || g.name; save(); });
+    const quick = card.querySelector(".quick");
+    [["+12",12],["+6",6],["+3",3],["+2",2],["+1",1],["+0.5",0.5],["+10",10]].forEach(([lab,val]) => {
+      const b = document.createElement("button");
+      b.textContent = lab;
+      if(val === 10) b.classList.add("fund");
+      b.onclick = () => addScore(i, val);
+      quick.appendChild(b);
+    });
+    const minus = document.createElement("button");
+    minus.textContent = "−1"; minus.className = "minus";
+    minus.onclick = () => addScore(i, -1);
+    quick.appendChild(minus);
+    box.appendChild(card);
+  });
+  renderLog();
+}
+function addScore(i, val){
+  groups[i].score = Math.round((groups[i].score + val) * 10) / 10;
+  ops.push({i, val});
+  save(); renderGroups();
+  const el = $("#groups").children[i]?.querySelector(".score");
+  if(el){ el.classList.add("bump"); setTimeout(()=>el.classList.remove("bump"), 160); }
+  beep(val > 0 ? 720 : 320, .07);
+}
+function renderLog(){
+  const box = $("#logBox");
+  box.innerHTML = ops.length
+    ? "最近操作：" + ops.slice(-5).map(o => `${groups[o.i].name} ${o.val>0?"+":""}${o.val}`).join("、")
+      + '<span class="undo" id="undoBtn">撤销上一步</span>'
+    : "";
+  const u = $("#undoBtn");
+  if(u) u.onclick = () => {
+    const o = ops.pop();
+    if(!o) return;
+    groups[o.i].score = Math.round((groups[o.i].score - o.val) * 10) / 10;
+    save(); renderGroups();
+  };
+}
+$("#fundAll").onclick = () => { groups.forEach(g => g.score += 10); save(); renderGroups(); beep(880,.15); };
+$("#clearAll").onclick = () => {
+  if(confirm("确认把所有组清零吗？")){ groups.forEach(g => g.score = 0); ops = []; save(); renderGroups(); }
+};
+document.querySelectorAll(".gnum").forEach(b => b.onclick = () => {
+  const n = +b.dataset.n;
+  groups = defaultGroups(n); ops = []; save(); renderGroups();
+});
+
+/* ───────── keyboard ───────── */
+document.addEventListener("keydown", e => {
+  if(e.code !== "Space") return;
+  const tag = document.activeElement.tagName;
+  if(tag === "INPUT" || document.activeElement.isContentEditable) return;
+  e.preventDefault();
+  if($("#pa").classList.contains("active")) drawLetter();
+  else if($("#pb").classList.contains("active")) spin();
+});
+
+/* init */
+renderBank(); renderMask(); renderBalls(); renderGroups();
+</script>
+</body>
+</html>
