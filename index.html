@@ -54,6 +54,21 @@ nav button.active{background:var(--bg); color:var(--red); font-weight:700;}
 .g9.win .combo{color:var(--red);}
 .g9.near{background:#FAFAF6; border-style:dashed;}
 .g9 .tag{position:absolute; top:6px; right:9px; font-size:11px; color:var(--gold-dark); font-weight:700;}
+.add-row{display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; margin:10px 0;}
+.add-row input{padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:15px; width:120px;}
+.num-pick{display:flex; gap:6px;}
+.num-pick button{width:40px; height:40px; border-radius:10px; background:var(--surface); border:1px solid var(--line); font-size:18px; font-weight:700; color:var(--text);}
+.num-pick button.sel{background:var(--red); color:#fff; border-color:var(--red);}
+.num5{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; max-width:760px; margin:12px auto;}
+.n5{border:2px solid var(--line); border-radius:12px; padding:10px 6px; background:#fff; min-height:120px; position:relative;}
+.n5 .big{font-size:30px; font-weight:800; color:var(--text); margin-bottom:6px;}
+.n5.win{border-color:var(--gold); background:#FDF6E7; box-shadow:0 0 0 2px rgba(217,164,65,.3);}
+.n5.win .big{color:var(--red);}
+.n5.near{background:#FAFAF6; border-style:dashed;}
+.n5.far{opacity:.5;}
+.chip{display:inline-block; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:3px 10px; font-size:13px; margin:2px 1px; cursor:pointer;}
+.chip:hover{border-color:var(--red); color:var(--red);}
+.n5 .tag{position:absolute; top:5px; right:8px; font-size:11px; color:var(--gold-dark); font-weight:700;}
 
 main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
 .page{display:none;}
@@ -193,6 +208,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   <button data-page="pa" class="active">🎱 游戏A · 幸运字母</button>
   <button data-page="pb">🎰 游戏B · 开奖</button>
   <button data-page="pg">✊ 游戏C · 石头剪刀布</button>
+  <button data-page="pe">🤝 游戏D · 全班的希望</button>
   <button data-page="pc">🏆 计分板</button>
   <button data-page="pd">📋 规则速查</button>
 </nav>
@@ -270,6 +286,32 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   </div>
 </section>
 
+<!-- ═══════════ Game D ═══════════ -->
+<section class="page" id="pe">
+  <div class="card" style="text-align:center;">
+    <div class="round-tag">共享型 · 全班的希望 · 押 1–5 中一个数字，最接近者吃一半</div>
+    <div class="pool-bar">🏆 奖池 <b id="dPool">0</b>🌟 ｜ <span id="dPeople">0</span> 人 × 2🌟</div>
+    <div class="add-row">
+      <input id="dName" placeholder="学生姓名" maxlength="8" autocomplete="off">
+      <div class="num-pick" id="dPick">
+        <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button>
+      </div>
+      <button class="ghost-btn" id="dAdd">加入</button>
+      <button class="ghost-btn" id="dClear">清空名单</button>
+    </div>
+    <div class="num5" id="dBoxes"></div>
+    <p class="hint-line" style="margin:2px 0 10px;">输入姓名 → 选数字 → 加入（点号码箱里的名字可移除）；同号即同命运，这是西班牙式共享精神</p>
+    <div class="gb-ball" id="dBall" style="width:170px;height:170px;margin:14px auto;">
+      <div class="num" id="dNum" style="font-size:78px;">?</div>
+      <div class="lab">THE DRAW 1–5</div>
+    </div>
+    <button class="big-btn" id="dSpin">开出号码</button>
+    <button class="ghost-btn" id="dReDraw" style="margin-left:10px;">重新开奖</button>
+    <div class="gb-verdict" id="dVerdict"></div>
+    <p class="hint-line">开奖后：<b>最接近开奖数字的人平分奖池一半</b>（并列则一起平分），<b>其余人按接近权重（5−距离）瓜分另一半</b>；若全场同为最近，则平分整个奖池。奖金全部来自彼此注金，零抽水。</p>
+  </div>
+</section>
+
 <!-- ═══════════ Scoreboard ═══════════ -->
 <section class="page" id="pc">
   <div class="sb-tools">
@@ -314,6 +356,20 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
       <tr><td>滚存</td><td>全场无人沾边 → 奖池滚存下一轮</td></tr>
     </table>
     <p class="hint-line">示例：8 注共 16🌟 奖池，2 注全中、3 注对一局 → 总权重 2×4+3×1=11；全中每注 16×4÷11≈5.8🌟，对一局每注≈1.5🌟。这是 Pari-mutuel（彩池瓜分）：快乐 8 的浮动奖、赛马投注都是这一类——与游戏 B「固定赔率、庄家抽水」互为对照组。</p>
+  </div>
+
+  <div class="rule-sec card">
+    <h3>游戏 D · 规则（共享型 · 全班的希望 · 最近数字瓜分）</h3>
+    <table>
+      <tr><th style="width:90px;">项目</th><th>规则</th></tr>
+      <tr><td>人数</td><td>1–12 人（本游戏按个人玩，适合 10 人左右的小班）</td></tr>
+      <tr><td>押号</td><td>每人 2🌟 押 1–5 中一个数字，同号即同命运（可多人同号）</td></tr>
+      <tr><td>开奖</td><td>开出 X ∈ 1–5（等概率）</td></tr>
+      <tr><td>一半</td><td>最接近 X 的人（|押号−X| 最小，并列一起）<b>平分奖池 50%</b></td></tr>
+      <tr><td>另一半</td><td>其余人按接近权重（5−距离）<b>瓜分剩余 50%</b></td></tr>
+      <tr><td>特例</td><td>全场同为最近 → 平分整个奖池；仅 1 人 → 独得</td></tr>
+    </table>
+    <p class="hint-line">示例（10 人 20🌟，押 1×2 人、2×3 人、3×2 人、4×2 人、5×1 人，开 3）：押 3 的 2 人最近，平分 10🌟 各得 5🌟；其余 8 人按权重 4/4/3/3 瓜分 10🌟（总权重 29）——押 2、4 的各约 1.4🌟，押 1、5 的各约 1.0🌟。共享精神源自西班牙圣诞彩票：同一号码，命运共享——号码一起中，全村一起庆。</p>
   </div>
 
   <div class="rule-sec card">
@@ -699,6 +755,100 @@ $("#cD").onclick = () => cPick("平");
 $("#cB").onclick = () => cPick("负");
 $("#cReset").onclick = () => { cState.bets = Array(9).fill(0); cState.results = []; cRender(); };
 
+/* ───────── Game D：共享型 · 最近数字瓜分 ───────── */
+const dState = { students: [], result: null };
+let dSelNum = null, dSpinning = false;
+function dRender(){
+  const wrap = $("#dBoxes"); wrap.innerHTML = "";
+  const dist = n => dState.result === null ? null : Math.abs(n - dState.result);
+  const minD = dState.result !== null && dState.students.length
+    ? Math.min(...dState.students.map(s => Math.abs(s.num - dState.result))) : null;
+  for(let n = 1; n <= 5; n++){
+    const box = document.createElement("div");
+    box.className = "n5";
+    if(dState.result !== null){
+      const d = dist(n);
+      if(d === minD) box.classList.add("win");
+      else if(d === minD + 1) box.classList.add("near");
+      else box.classList.add("far");
+    }
+    const big = document.createElement("div");
+    big.className = "big"; big.textContent = n;
+    box.appendChild(big);
+    dState.students.filter(s => s.num === n).forEach(s => {
+      const chip = document.createElement("span");
+      chip.className = "chip"; chip.textContent = s.name; chip.title = "点击移除";
+      chip.onclick = () => { dState.students = dState.students.filter(x => x !== s); dRender(); };
+      box.appendChild(chip);
+    });
+    if(dState.result !== null && dist(n) === minD){
+      const t = document.createElement("div");
+      t.className = "tag"; t.textContent = "最近";
+      box.appendChild(t);
+    }
+    wrap.appendChild(box);
+  }
+  $("#dPool").textContent = dState.students.length * 2;
+  $("#dPeople").textContent = dState.students.length;
+  const v = $("#dVerdict");
+  if(dState.result === null || !dState.students.length){
+    v.classList.remove("show"); v.innerHTML = ""; return;
+  }
+  const pool = dState.students.length * 2, half = pool / 2;
+  const ds = dState.students.map(s => Math.abs(s.num - dState.result));
+  const min = Math.min(...ds);
+  const winners = dState.students.filter((s, i) => ds[i] === min);
+  const rest = dState.students.filter((s, i) => ds[i] > min);
+  const perWin = rest.length ? half / winners.length : pool / winners.length;
+  const wSum = rest.reduce((t, s) => t + (5 - Math.abs(s.num - dState.result)), 0);
+  let html = `<div class="row"><b>开奖</b><span>开出 <b>${dState.result}</b> ｜ 奖池 ${pool}🌟（${dState.students.length} 人 × 2🌟）</span></div>`;
+  html += `<div class="row win"><b>最近</b><span>差 ${min}：${winners.map(s => s.name).join("、")} → ${rest.length ? "平分一半，" : "全场同为最近，平分整个奖池，"}每人 <b>+${perWin.toFixed(1)}🌟</b></span></div>`;
+  if(rest.length){
+    const parts = rest.map(s => {
+      const share = (pool - half) * (5 - Math.abs(s.num - dState.result)) / wSum;
+      return `${s.name}(押${s.num} 差${Math.abs(s.num - dState.result)}) +${share.toFixed(1)}`;
+    }).join(" ｜ ");
+    html += `<div class="row"><b>其余</b><span>按接近权重（5−距离）瓜分另一半 ${pool - half}🌟：${parts}</span></div>`;
+  }
+  v.innerHTML = html; v.classList.add("show");
+}
+function dSpin(){
+  if(dSpinning || dState.students.length === 0) return;
+  dSpinning = true;
+  const res = 1 + Math.floor(Math.random() * 5);
+  const num = $("#dNum"), ball = $("#dBall");
+  ball.classList.add("rolling");
+  let elapsed = 0, delay = 55; const total = 1600;
+  (function tick(){
+    num.textContent = 1 + Math.floor(Math.random() * 5);
+    beep(300 + Math.random() * 60, .03, "square", .05);
+    elapsed += delay; delay = 55 + Math.pow(elapsed / total, 2.4) * 320;
+    if(elapsed < total){ setTimeout(tick, delay); }
+    else{
+      dState.result = res; num.textContent = res;
+      ball.classList.remove("rolling");
+      [659, 880].forEach((f, i) => setTimeout(() => beep(f, .2, "sine", .15), i * 130));
+      dRender(); dSpinning = false;
+    }
+  })();
+}
+document.querySelectorAll("#dPick button").forEach(b => b.onclick = () => {
+  dSelNum = +b.dataset.n;
+  document.querySelectorAll("#dPick button").forEach(x => x.classList.toggle("sel", x === b));
+});
+$("#dAdd").onclick = () => {
+  const name = $("#dName").value.trim();
+  if(!name){ alert("请输入学生姓名"); return; }
+  if(!dSelNum){ alert("请选择押的数字 1–5"); return; }
+  if(dState.students.length >= 12){ alert("最多 12 人"); return; }
+  dState.students.push({ name, num: dSelNum });
+  $("#dName").value = ""; beep(720, .06); dRender();
+};
+$("#dName").addEventListener("keydown", e => { if(e.key === "Enter") $("#dAdd").click(); });
+$("#dClear").onclick = () => { dState.students = []; dState.result = null; $("#dNum").textContent = "?"; dRender(); };
+$("#dSpin").onclick = dSpin;
+$("#dReDraw").onclick = () => { dState.result = null; $("#dNum").textContent = "?"; dRender(); };
+
 /* ───────── Scoreboard ───────── */
 const LS_KEY = "luckyMorningScores";
 let groups = JSON.parse(localStorage.getItem(LS_KEY) || "null") || defaultGroups(6);
@@ -788,7 +938,7 @@ document.addEventListener("keydown", e => {
 });
 
 /* init */
-renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender();
+renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender(); dRender();
 </script>
 </body>
 </html>
