@@ -84,6 +84,8 @@ main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
   animation:drop .45s cubic-bezier(.2,1.4,.4,1);
 }
 .ball:nth-child(even){background:var(--gold); color:var(--dark);}
+.ball.rz{background:var(--gold); color:var(--dark);}
+.ball.wz{background:var(--red); color:#fff; border:2px solid var(--gold);}
 @keyframes drop{0%{transform:translateY(-90px) scale(.4); opacity:0;}100%{transform:translateY(0) scale(1); opacity:1;}}
 .slot{width:80px;height:80px;border-radius:50%;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;color:#D5CEC0;font-size:22px;}
 .drawn-count{color:var(--muted); font-size:14px;}
@@ -217,7 +219,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
         <button class="ghost-btn" id="resetRoundBtn">重置本轮</button>
       </div>
       <div class="read-cmd" id="readCmd"></div>
-      <p class="hint-line">开出 10 个字母 = 谜底单词的字母（打乱）+ 随机字母补足，顺序随机。命中数 = 你押的 10 个字母与开出的 10 个字母的重合个数，对照规则速查页奖级表就高领奖；猜对单词另有附加奖。</p>
+      <p class="hint-line">开出 10 个字母 = <b>前段随机字母 + 后段谜底单词字母</b>（仿双色球分区，两段长度随单词长度调整）。命中数 = 你押的 10 个字母与开出 10 个字母的重合个数，对照规则速查页奖级表就高领奖；猜对单词另有附加奖。</p>
     </div>
   </div>
 </section>
@@ -282,7 +284,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
       <tr><td>五等奖</td><td>猜中 2 个及以上</td><td class="c">+1</td><td class="c">约 66%</td></tr>
       <tr><td>附加奖</td><td>猜对单词（不论字母）</td><td class="c">+2</td><td class="c">靠实力</td></tr>
     </table>
-    <p class="hint-line">开出 10 个字母 = 谜底单词的字母（打乱）+ 随机字母补足；就高领奖、不叠发。会猜单词能大幅提高命中——押高频字母（E/T/A/O）在这个游戏里是真实策略，因为它们有「在单词里」+「被随机开出」两条中奖路径。附加奖仿自竞彩「靠知识不靠运气」。</p>
+    <p class="hint-line">开出 10 个字母 = <b>前段随机字母（10−L 个）+ 后段谜底单词字母（L 个，L=单词字母数）</b>，仿双色球红蓝分区，分界随单词长度调整；就高领奖、不叠发。<b>后段必开单词字母——猜出单词 ≈ 锁定后段</b>，押 E/T/A/O 依然聪明：它们大概率在单词里。附加奖仿自竞彩「靠知识不靠运气」。</p>
   </div>
 
   <div class="rule-sec card">
@@ -483,7 +485,9 @@ function renderBalls(){
   for(let i = 0; i < 10; i++){
     if(i < state.drawn.length){
       const b = document.createElement("div");
-      b.className = "ball"; b.textContent = state.drawn[i];
+      b.className = "ball " + (i < state.rndZone ? "rz" : "wz");
+      b.title = i < state.rndZone ? "随机段" : "单词段";
+      b.textContent = state.drawn[i];
       row.appendChild(b);
     } else {
       const s = document.createElement("div");
@@ -491,7 +495,7 @@ function renderBalls(){
       row.appendChild(s);
     }
   }
-  $("#drawnCount").textContent = `已开 ${state.drawn.length} / 10`;
+  $("#drawnCount").textContent = `已开 ${state.drawn.length} / 10 · 金球=随机段，红球=单词段`;
   $("#drawBtn").disabled = state.drawn.length >= 10 || state.revealed;
   $("#fastBtn").disabled = state.drawn.length >= 10 || state.revealed;
   $("#revealBtn").disabled = state.revealed;
@@ -503,12 +507,12 @@ function shuffleArr(a){
   }
   return a;
 }
-/* 开奖序列：谜底单词的字母（去重打乱）+ 随机字母补足，共 10 个 */
+/* 开奖序列（双色球式分区）：前段随机字母 + 后段谜底单词字母，两段大小随单词长度调整 */
 function buildSeq(){
-  const wordLetters = [...new Set(state.cur.w.split(""))];
-  const rest = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c => !wordLetters.includes(c));
-  shuffleArr(wordLetters); shuffleArr(rest);
-  state.seq = wordLetters.concat(rest).slice(0, 10);
+  const wordLetters = shuffleArr([...new Set(state.cur.w.split(""))]).slice(0, 10);
+  const rest = shuffleArr("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c => !wordLetters.includes(c)));
+  state.rndZone = 10 - wordLetters.length;
+  state.seq = rest.slice(0, state.rndZone).concat(wordLetters);
 }
 function drawLetter(){
   if(state.drawn.length >= 10 || state.revealed) return;
