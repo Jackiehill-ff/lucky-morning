@@ -43,6 +43,17 @@ nav button.active{background:var(--bg); color:var(--red); font-weight:700;}
 .rps-opts{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:18px 0;}
 .rps-opts .big-btn{min-width:170px;}
 .c-strip{display:flex; gap:12px; justify-content:center; min-height:80px; margin:14px 0; align-items:center; flex-wrap:wrap;}
+.pool-bar{font-size:18px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 16px; display:inline-block; margin:6px 0 2px;}
+.pool-bar b{color:var(--red); font-size:24px;}
+.grid9{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:640px; margin:12px auto;}
+.g9{border:1.5px solid var(--line); border-radius:12px; padding:8px 6px 10px; background:#fff; position:relative;}
+.g9 .combo{font-size:21px; font-weight:800; letter-spacing:3px; color:var(--text);}
+.g9 .cnt{font-size:13px; color:var(--muted); margin:2px 0 6px;}
+.g9 .mini{background:var(--surface); border:1px solid var(--line); border-radius:7px; width:36px; height:30px; font-size:16px; color:var(--text); margin:0 3px;}
+.g9.win{border-color:var(--gold); background:#FDF6E7; box-shadow:0 0 0 2px rgba(217,164,65,.35);}
+.g9.win .combo{color:var(--red);}
+.g9.near{background:#FAFAF6; border-style:dashed;}
+.g9 .tag{position:absolute; top:6px; right:9px; font-size:11px; color:var(--gold-dark); font-weight:700;}
 
 main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
 .page{display:none;}
@@ -140,6 +151,7 @@ details.teacher[open] summary{color:var(--red);}
 .quick button{padding:6px 10px; font-size:14px; border-radius:8px; background:var(--surface); border:1px solid var(--line); color:var(--text);}
 .quick button:hover{border-color:var(--gold);}
 .quick button.minus{color:var(--red);}
+.quick input{width:58px; padding:6px; border:1px solid var(--line); border-radius:8px; font-size:13px;}
 .quick button.fund{background:#FDF6E7; border-color:var(--gold); font-weight:700;}
 .logbox{margin-top:18px; font-size:13px; color:var(--muted);}
 .logbox .undo{color:var(--red); margin-left:8px; cursor:pointer; text-decoration:underline;}
@@ -239,19 +251,22 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 <!-- ═══════════ Game C ═══════════ -->
 <section class="page" id="pg">
   <div class="card" style="text-align:center;">
-    <div class="round-tag">第 <span id="cRound">1</span> 局 / 5 · 各组竞猜卡已赛前锁定（甲胜 / 平 / 乙胜 × 5 局）</div>
+    <div class="round-tag">第 <span id="cRound">1</span> 局 / 2 · 站在选手甲视角记两局结果（甲胜=胜 · 平=平 · 乙胜=负）</div>
+    <div class="pool-bar">🏆 奖池 <b id="cPool">0</b>🌟 ｜ <span id="cBets">0</span> 注 × 2🌟</div>
+    <div class="grid9" id="cGrid"></div>
+    <p class="hint-line" style="margin:4px 0 12px;">九选一（第1局·第2局）：各组赛前押 1 注 2🌟，老师点对应格子「+」计注、可「−」修正</p>
     <div class="c-strip" id="cStrip"></div>
     <div class="rps-opts" id="cOpts">
-      <button class="big-btn gold" id="cA">选手甲 胜</button>
+      <button class="big-btn gold" id="cA">甲 胜</button>
       <button class="big-btn" id="cD">平 局</button>
-      <button class="big-btn" id="cB">选手乙 胜</button>
+      <button class="big-btn" id="cB">乙 胜</button>
     </div>
-    <div class="drawn-count" id="cCount">已赛 0 / 5 局</div>
+    <div class="drawn-count" id="cCount">已赛 0 / 2 局</div>
     <div class="read-cmd" id="cSummary" style="display:none;"></div>
     <div style="margin-top:14px;">
-      <button class="ghost-btn" id="cReset">重置五局</button>
+      <button class="ghost-btn" id="cReset">重置本轮</button>
     </div>
-    <p class="hint-line">玩法：两位选手上台石头剪刀布，老师按真实结果点按钮；各组对照手中竞猜卡数命中局数，按奖级表就高领奖。赛前出票、开赛不改票——固定赔率的竞彩规则。</p>
+    <p class="hint-line">两局比完自动结算：<b>两局全中的注按权重 4 瓜分整个奖池，只对一局的注按权重 1 参与瓜分</b>；全场无人沾边则奖池滚存下一轮。全班互相对赌、庄家零抽水——这就是赛马与快乐 8 浮动奖的 Pari-mutuel（彩池瓜分）机制，与游戏 B 的固定赔率构成对照组。计分板每组卡片有「自定」加分区，用于发放瓜分奖金。</p>
   </div>
 </section>
 
@@ -288,16 +303,17 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   </div>
 
   <div class="rule-sec card">
-    <h3>游戏 C · 奖级表（竞猜型 · 石头剪刀布五局竞猜）</h3>
+    <h3>游戏 C · 规则（竞猜型 · 石头剪刀布两局 · 彩池瓜分）</h3>
     <table>
-      <tr><th>奖级</th><th>条件</th><th class="c">分数</th><th class="c">纯瞎猜参考概率</th></tr>
-      <tr><td>一等奖</td><td>5 局全对</td><td class="c"><b>+10</b></td><td class="c">约 1/243</td></tr>
-      <tr><td>二等奖</td><td>猜对 4 局</td><td class="c">+5</td><td class="c">约 4%</td></tr>
-      <tr><td>三等奖</td><td>猜对 3 局</td><td class="c">+3</td><td class="c">约 16%</td></tr>
-      <tr><td>四等奖</td><td>猜对 2 局</td><td class="c">+2</td><td class="c">约 33%</td></tr>
-      <tr><td>五等奖</td><td>猜对 1 局</td><td class="c">+1</td><td class="c">约 33%</td></tr>
+      <tr><th style="width:90px;">项目</th><th>规则</th></tr>
+      <tr><td>选项</td><td>九选一（第1局·第2局，站在选手甲视角）：胜胜 / 胜平 / 胜负 / 平胜 / 平平 / 平负 / 负胜 / 负平 / 负负</td></tr>
+      <tr><td>下注</td><td>每组赛前押 1 注（2🌟）于一个组合，开赛不改票；奖池 = 全部注金</td></tr>
+      <tr><td>全中</td><td>两局结果全对（概率 1/9）→ 权重 4，参与瓜分</td></tr>
+      <tr><td>对一局</td><td>只对一局（至少对一局概率 5/9）→ 权重 1，参与瓜分</td></tr>
+      <tr><td>瓜分</td><td>每注得分 = 奖池 × 权重 ÷ 总权重，庄家零抽水，奖金全部来自彼此</td></tr>
+      <tr><td>滚存</td><td>全场无人沾边 → 奖池滚存下一轮</td></tr>
     </table>
-    <p class="hint-line">赛前出票锁定 5 局预测（甲胜/平/乙胜），开赛不改票；就高领奖。固定赔率的奥秘：赔率是提前算好概率再打折定出来的——The house always wins。</p>
+    <p class="hint-line">示例：8 注共 16🌟 奖池，2 注全中、3 注对一局 → 总权重 2×4+3×1=11；全中每注 16×4÷11≈5.8🌟，对一局每注≈1.5🌟。这是 Pari-mutuel（彩池瓜分）：快乐 8 的浮动奖、赛马投注都是这一类——与游戏 B「固定赔率、庄家抽水」互为对照组。</p>
   </div>
 
   <div class="rule-sec card">
@@ -590,37 +606,98 @@ $("#spinResetBtn").onclick = () => {
   $("#gbVerdict").classList.remove("show");
 };
 
-/* ───────── Game C ───────── */
-const cState = { results: [] };
+/* ───────── Game C：两局九选一 · 彩池瓜分 ───────── */
+const C_R = ["胜", "平", "负"];
+const cState = { bets: Array(9).fill(0), results: [] };
+function cHits(i){
+  const r1 = C_R[Math.floor(i / 3)] === cState.results[0];
+  const r2 = C_R[i % 3] === cState.results[1];
+  return (r1 ? 1 : 0) + (r2 ? 1 : 0);
+}
+function cSettle(){
+  const pool = cState.bets.reduce((s, n) => s + n, 0) * 2;
+  let totalW = 0;
+  cState.bets.forEach((n, i) => {
+    const h = cHits(i);
+    totalW += n * (h === 2 ? 4 : h === 1 ? 1 : 0);
+  });
+  return { pool, totalW };
+}
 function cRender(){
-  const done = cState.results.length >= 5;
-  $("#cRound").textContent = Math.min(cState.results.length + 1, 5);
+  const done = cState.results.length >= 2;
+  $("#cRound").textContent = Math.min(cState.results.length + 1, 2);
+  const grid = $("#cGrid"); grid.innerHTML = "";
+  const st = done ? cSettle() : null;
+  const perFull = st && st.totalW ? st.pool * 4 / st.totalW : 0;
+  const perOne  = st && st.totalW ? st.pool * 1 / st.totalW : 0;
+  for(let i = 0; i < 9; i++){
+    const cell = document.createElement("div");
+    cell.className = "g9";
+    let tag = "";
+    if(done){
+      const h = cHits(i);
+      if(h === 2){ cell.classList.add("win"); tag = "全中"; }
+      else if(h === 1){ cell.classList.add("near"); tag = "对1局"; }
+    }
+    const combo = document.createElement("div");
+    combo.className = "combo"; combo.textContent = C_R[Math.floor(i / 3)] + C_R[i % 3];
+    const cnt = document.createElement("div");
+    cnt.className = "cnt"; cnt.textContent = cState.bets[i] + " 注";
+    const row = document.createElement("div");
+    const minus = document.createElement("button");
+    minus.className = "mini"; minus.textContent = "−";
+    minus.onclick = () => { if(cState.bets[i] > 0){ cState.bets[i]--; beep(320,.05); cRender(); } };
+    const plus = document.createElement("button");
+    plus.className = "mini"; plus.textContent = "+";
+    plus.onclick = () => { cState.bets[i]++; beep(660,.05); cRender(); };
+    row.appendChild(minus); row.appendChild(plus);
+    if(tag){ const t = document.createElement("div"); t.className = "tag"; t.textContent = tag; cell.appendChild(t); }
+    cell.appendChild(combo); cell.appendChild(cnt); cell.appendChild(row);
+    grid.appendChild(cell);
+  }
+  const bets = cState.bets.reduce((s, n) => s + n, 0);
+  $("#cPool").textContent = bets * 2;
+  $("#cBets").textContent = bets;
   const strip = $("#cStrip"); strip.innerHTML = "";
-  for(let i = 0; i < 5; i++){
+  for(let i = 0; i < 2; i++){
     if(i < cState.results.length){
       const b = document.createElement("div");
       b.className = "ball"; b.textContent = cState.results[i];
       strip.appendChild(b);
     } else {
       const s = document.createElement("div");
-      s.className = "slot"; s.textContent = i + 1;
+      s.className = "slot"; s.textContent = "第" + (i + 1) + "局";
       strip.appendChild(s);
     }
   }
-  $("#cCount").textContent = `已赛 ${cState.results.length} / 5 局`;
+  $("#cCount").textContent = `已赛 ${cState.results.length} / 2 局`;
   $("#cOpts").style.display = done ? "none" : "flex";
   const sum = $("#cSummary");
   sum.style.display = done ? "block" : "none";
   if(done){
-    sum.innerHTML = "五局结果：" + cState.results.join(" · ")
-      + "<br>各组对照竞猜卡计命中局数 —— 5对=10🌟 · 4对=5🌟 · 3对=3🌟 · 2对=2🌟 · 1对=1🌟（就高领奖，不叠发）";
+    if(st.totalW === 0){
+      sum.innerHTML = `两局结果：${cState.results.join(" · ")}——全场无人沾边，奖池 <b>${st.pool}</b>🌟 滚存下一轮！（真彩票的奖池就是这样攒起来的）`;
+    } else {
+      const fullBets = cState.bets[cIdxOfResult()];
+      const oneBets = cState.bets.reduce((s, n, i) => s + (cHits(i) === 1 ? n : 0), 0);
+      sum.innerHTML = `两局结果：${cState.results.join(" · ")}｜奖池 ${st.pool}🌟 按接近程度瓜分：<br>`
+        + `全中「${cState.results.join("")}」${fullBets} 注，每注 <b>+${perFull.toFixed(1)}</b>🌟`
+        + (oneBets ? ` ｜ 对一局 ${oneBets} 注，每注 <b>+${perOne.toFixed(1)}</b>🌟` : "");
+      [659, 880, 1046].forEach((f, k) => setTimeout(() => beep(f, .15, "sine", .14), k * 130));
+    }
   }
 }
-function cPick(r){ if(cState.results.length >= 5) return; cState.results.push(r); beep(r === "平" ? 520 : 760); cRender(); }
-$("#cA").onclick = () => cPick("甲");
+function cIdxOfResult(){ return C_R.indexOf(cState.results[0]) * 3 + C_R.indexOf(cState.results[1]); }
+function cPick(r){
+  if(cState.results.length >= 2) return;
+  cState.results.push(r);
+  beep(r === "平" ? 520 : 760);
+  cRender();
+}
+$("#cA").onclick = () => cPick("胜");
 $("#cD").onclick = () => cPick("平");
-$("#cB").onclick = () => cPick("乙");
-$("#cReset").onclick = () => { cState.results = []; cRender(); };
+$("#cB").onclick = () => cPick("负");
+$("#cReset").onclick = () => { cState.bets = Array(9).fill(0); cState.results = []; cRender(); };
 
 /* ───────── Scoreboard ───────── */
 const LS_KEY = "luckyMorningScores";
@@ -655,6 +732,16 @@ function renderGroups(){
     minus.textContent = "−1"; minus.className = "minus";
     minus.onclick = () => addScore(i, -1);
     quick.appendChild(minus);
+    const inp = document.createElement("input");
+    inp.type = "number"; inp.step = "0.1"; inp.placeholder = "自定";
+    inp.addEventListener("keydown", e => { if(e.key === "Enter"){ addBtn.click(); } });
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "加";
+    addBtn.onclick = () => {
+      const v = parseFloat(inp.value);
+      if(!isNaN(v) && v !== 0){ addScore(i, Math.round(v * 10) / 10); inp.value = ""; }
+    };
+    quick.appendChild(inp); quick.appendChild(addBtn);
     box.appendChild(card);
   });
   renderLog();
