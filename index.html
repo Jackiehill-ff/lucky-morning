@@ -69,6 +69,20 @@ nav button.active{background:var(--bg); color:var(--red); font-weight:700;}
 .chip{display:inline-block; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:3px 10px; font-size:13px; margin:2px 1px; cursor:pointer;}
 .chip:hover{border-color:var(--red); color:var(--red);}
 .n5 .tag{position:absolute; top:5px; right:8px; font-size:11px; color:var(--gold-dark); font-weight:700;}
+.q-progress{display:flex; gap:6px; justify-content:center; margin:6px 0 12px;}
+.q-progress i{width:11px; height:11px; border-radius:50%; background:var(--line); display:inline-block;}
+.q-progress i.done{background:var(--gold);}
+.q-progress i.cur{background:var(--red); transform:scale(1.3);}
+.q-text{font-size:22px; font-weight:700; text-align:center; margin:8px 0 18px; min-height:56px;}
+.q-opts{display:flex; flex-direction:column; gap:10px; max-width:640px; margin:0 auto;}
+.q-opt{display:flex; align-items:center; gap:12px; border:1.5px solid var(--line); border-radius:12px; padding:12px 16px; background:#fff; font-size:18px; text-align:left;}
+.q-opt .lab{width:34px; height:34px; border-radius:50%; background:var(--surface); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:800; flex:none;}
+.q-opt.guess{border-color:var(--red); box-shadow:0 0 0 2px rgba(179,40,45,.22);}
+.q-opt.correct{border-color:var(--gold); background:#FDF6E7; font-weight:700;}
+.q-opt.correct .lab{background:var(--gold); border-color:var(--gold);}
+.q-opt.dim{opacity:.4;}
+.q-explain{display:none; max-width:640px; margin:16px auto 0; background:var(--surface); border:1px dashed var(--gold); border-radius:12px; padding:12px 16px; font-size:15px; text-align:left;}
+.q-explain.show{display:block;}
 
 main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
 .page{display:none;}
@@ -209,6 +223,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   <button data-page="pb">🎰 游戏B · 开奖</button>
   <button data-page="pg">✊ 游戏C · 石头剪刀布</button>
   <button data-page="pe">🤝 游戏D · 全班的希望</button>
+  <button data-page="pf">🎓 常识竞猜</button>
   <button data-page="pc">🏆 计分板</button>
   <button data-page="pd">📋 规则速查</button>
 </nav>
@@ -309,6 +324,23 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
     <button class="ghost-btn" id="dReDraw" style="margin-left:10px;">重新开奖</button>
     <div class="gb-verdict" id="dVerdict"></div>
     <p class="hint-line">开奖后：<b>最接近开奖数字的人平分奖池一半</b>（并列则一起平分），<b>其余人按接近权重（5−距离）瓜分另一半</b>；若全场同为最近，则平分整个奖池。奖金全部来自彼此注金，零抽水。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 常识竞猜 ═══════════ -->
+<section class="page" id="pf">
+  <div class="card">
+    <div class="round-tag">彩票趣味常识竞猜 · 第 <span id="qIdx">1</span> / 12 题 · 全班抢答，答对组去计分板 +1</div>
+    <div class="q-progress" id="qDots"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="q-opts" id="qOpts"></div>
+    <div class="q-explain" id="qExplain"></div>
+    <div class="draw-btns" style="margin-top:18px; text-align:center;">
+      <button class="ghost-btn" id="qPrev">上一题</button>
+      <button class="big-btn gold" id="qReveal">揭晓答案</button>
+      <button class="ghost-btn" id="qNext">下一题</button>
+    </div>
+    <p class="hint-line">玩法：先让学生举手表决，老师点选全班的猜测（红框标记），再点「揭晓答案」——正确项金色高亮并弹出讲解；猜中有中奖音效。数据来源：财政部、各国彩票官网及公开报道（2024–2026），引用时可加一句「以官方最新公布为准」。</p>
   </div>
 </section>
 
@@ -849,6 +881,82 @@ $("#dClear").onclick = () => { dState.students = []; dState.result = null; $("#d
 $("#dSpin").onclick = dSpin;
 $("#dReDraw").onclick = () => { dState.result = null; $("#dNum").textContent = "?"; dRender(); };
 
+/* ───────── 常识竞猜 ───────── */
+const QUIZ = [
+  { q:"去年（2024 年）全国彩票一共卖了多少钱？", opts:["600 亿元左右","2000 亿元左右","超过 6000 亿元"], a:2,
+    x:"6234.86 亿元——历史首次突破 6000 亿、同比增长 7.6%；按约 3 亿购彩人算，人均一年约 2000 元。（来源：财政部）" },
+  { q:"每 2 元一注的双色球里，约有多少钱进入奖金池？", opts:["约 1.7 元","约 1.0 元","约 0.3 元"], a:1,
+    x:"返奖率约 51%，约 1 元进奖金池；发行费约 13%（0.26 元）；剩下约 36%（0.72 元）进公益金。" },
+  { q:"彩票公益金的用途不包括下面哪一项？", opts:["养老与社保","体育事业","给彩民分红"], a:2,
+    x:"公益金用于社保、养老、体育、医疗、助学、残疾人事业等公共支出——从来不会用来给彩民分红。" },
+  { q:"双色球头奖概率约 1/1772 万，大致相当于？", opts:["被雷劈一次","抛硬币连续 24 次正面","高考考全省第一"], a:1,
+    x:"2 的 24 次方约 1678 万，与 1772 万同一量级；而被雷劈的概率其实比这「高」得多。" },
+  { q:"全球最大单注彩票头奖纪录是多少？", opts:["2.04 亿美元","20.4 亿美元","2.5 亿欧元"], a:1,
+    x:"美国强力球 Powerball：2022 年 11 月加州一注独中 20.4 亿美元；欧洲百万 EuroMillions 封顶 2.5 亿欧元。" },
+  { q:"哪个国家开出头奖时，经常全镇人一起中奖？", opts:["美国","西班牙","日本"], a:1,
+    x:"西班牙圣诞彩票 El Gordo：一张整票拆成 10 份卖，同一号码还印多个系列——同号共中，2025 年奖池约 28.7 亿欧元。" },
+  { q:"中国第一张彩票是哪一年发行的？", opts:["1949 年","1987 年","2008 年"], a:1,
+    x:"1987 年 7 月，河北石家庄发行第一张福利彩票（面值 1 元）；体育彩票 1994 年全国统一发行。" },
+  { q:"现在是谁在买彩票（中国）？", opts:["只有老年人","中低收入为主、且快速年轻化","只有富人"], a:1,
+    x:"传统彩民以中低收入、中年群体为主；但 Z 世代已占体彩购彩者约 38%（2022 年体彩报告），超过 72% 的人说只是「图一乐」。" },
+  { q:"一张彩票中了 1 万零 1 百元，实际到手？", opts:["全额发放","超出 1 万的部分扣 20% 税"], a:1,
+    x:"同一张彩票中奖合计超过 1 万元，超出部分按 20% 代扣偶然所得税；1 万元及以下免税。" },
+  { q:"彩票开奖后多久内必须兑奖？", opts:["当天有效","60 个自然日","一整年"], a:1,
+    x:"开奖之日起 60 个自然日内兑奖，逾期视为弃奖，纳入彩票公益金。" },
+  { q:"日本年末 Jumbo 彩票一等奖（含前后赏）一共多少钱？", opts:["1 亿日元","7 亿日元","10 亿日元"], a:2,
+    x:"1 等 7 亿日元 + 前后赏各 1.5 亿，合计 10 亿日元；顺带一提：日本中奖免税。" },
+  { q:"判断：自己选号比机选更容易中奖？", opts:["对，用心选的更灵","错，两者概率完全相同"], a:1,
+    x:"每注中奖概率完全相同——这是典型的「控制错觉」。不过自选冷门号有一个真实好处：真的中了，不容易和别人平分头奖。" },
+];
+const qState = QUIZ.map(() => ({ guess: null, revealed: false }));
+let qi = 0;
+function qRender(){
+  const item = QUIZ[qi], st = qState[qi];
+  $("#qIdx").textContent = qi + 1;
+  $("#qText").textContent = item.q;
+  const box = $("#qOpts"); box.innerHTML = "";
+  item.opts.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "q-opt";
+    const lab = document.createElement("span");
+    lab.className = "lab"; lab.textContent = "ABC"[i];
+    const tx = document.createElement("span"); tx.textContent = t;
+    b.appendChild(lab); b.appendChild(tx);
+    if(st.revealed){
+      if(i === item.a) b.classList.add("correct");
+      else if(i === st.guess) b.classList.add("guess");
+      else b.classList.add("dim");
+    } else if(i === st.guess){
+      b.classList.add("guess");
+    }
+    b.onclick = () => { if(!st.revealed){ st.guess = i; beep(600, .05); qRender(); } };
+    box.appendChild(b);
+  });
+  const dots = $("#qDots"); dots.innerHTML = "";
+  qState.forEach((s, k) => {
+    const d = document.createElement("i");
+    if(s.revealed) d.classList.add("done");
+    if(k === qi) d.classList.add("cur");
+    dots.appendChild(d);
+  });
+  const ex = $("#qExplain");
+  ex.textContent = "💡 " + item.x;
+  ex.classList.toggle("show", st.revealed);
+  $("#qReveal").disabled = st.revealed;
+}
+$("#qReveal").onclick = () => {
+  const st = qState[qi];
+  st.revealed = true;
+  if(st.guess === QUIZ[qi].a){
+    [523, 659, 784, 1046].forEach((f, k) => setTimeout(() => beep(f, .12, "sine", .13), k * 100));
+  } else {
+    beep(330, .2);
+  }
+  qRender();
+};
+$("#qPrev").onclick = () => { if(qi > 0){ qi--; qRender(); } };
+$("#qNext").onclick = () => { if(qi < QUIZ.length - 1){ qi++; qRender(); } };
+
 /* ───────── Scoreboard ───────── */
 const LS_KEY = "luckyMorningScores";
 let groups = JSON.parse(localStorage.getItem(LS_KEY) || "null") || defaultGroups(6);
@@ -938,7 +1046,7 @@ document.addEventListener("keydown", e => {
 });
 
 /* init */
-renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender(); dRender();
+renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender(); dRender(); qRender();
 </script>
 </body>
 </html>
