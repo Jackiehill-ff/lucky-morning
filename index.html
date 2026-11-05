@@ -40,6 +40,9 @@ nav button{
   background:#332B24; color:#C8C0B4; padding:9px 16px; font-size:15px; border-radius:10px 10px 0 0;
 }
 nav button.active{background:var(--bg); color:var(--red); font-weight:700;}
+.rps-opts{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:18px 0;}
+.rps-opts .big-btn{min-width:170px;}
+.c-strip{display:flex; gap:12px; justify-content:center; min-height:80px; margin:14px 0; align-items:center; flex-wrap:wrap;}
 
 main{max-width:1180px; margin:0 auto; padding:22px 18px 60px;}
 .page{display:none;}
@@ -175,6 +178,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 <nav>
   <button data-page="pa" class="active">🎱 游戏A · 幸运字母</button>
   <button data-page="pb">🎰 游戏B · 开奖</button>
+  <button data-page="pg">✊ 游戏C · 石头剪刀布</button>
   <button data-page="pc">🏆 计分板</button>
   <button data-page="pd">📋 规则速查</button>
 </nav>
@@ -205,14 +209,15 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 
     <div class="draw-zone">
       <div class="balls-row" id="ballsRow"></div>
-      <div class="drawn-count" id="drawnCount">已抽 0 / 7</div>
+      <div class="drawn-count" id="drawnCount">已开 0 / 10</div>
       <div class="draw-btns" style="margin-top:12px;">
-        <button class="big-btn" id="drawBtn">抽 1 个字母（空格）</button>
+        <button class="big-btn" id="drawBtn">开 1 个字母（空格）</button>
+        <button class="big-btn gold" id="fastBtn">一键开完</button>
         <button class="big-btn gold" id="revealBtn">揭晓单词</button>
         <button class="ghost-btn" id="resetRoundBtn">重置本轮</button>
       </div>
       <div class="read-cmd" id="readCmd"></div>
-      <p class="hint-line">抽字母 = 字母杯；每轮抽 7 个、不放回。判定：对照规则速查页的奖级表举手申报。</p>
+      <p class="hint-line">开出 10 个字母 = 谜底单词的字母（打乱）+ 随机字母补足，顺序随机。命中数 = 你押的 10 个字母与开出的 10 个字母的重合个数，对照规则速查页奖级表就高领奖；猜对单词另有附加奖。</p>
     </div>
   </div>
 </section>
@@ -226,6 +231,25 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
     <button class="ghost-btn" id="spinResetBtn" style="margin-left:10px;">重置</button>
     <div class="gb-verdict" id="gbVerdict"></div>
     <p class="hint-line">开奖后按下方判定领分；建议把各组押卡情况写在黑板，开奖时全班一起喊。</p>
+  </div>
+</section>
+
+<!-- ═══════════ Game C ═══════════ -->
+<section class="page" id="pg">
+  <div class="card" style="text-align:center;">
+    <div class="round-tag">第 <span id="cRound">1</span> 局 / 5 · 各组竞猜卡已赛前锁定（甲胜 / 平 / 乙胜 × 5 局）</div>
+    <div class="c-strip" id="cStrip"></div>
+    <div class="rps-opts" id="cOpts">
+      <button class="big-btn gold" id="cA">选手甲 胜</button>
+      <button class="big-btn" id="cD">平 局</button>
+      <button class="big-btn" id="cB">选手乙 胜</button>
+    </div>
+    <div class="drawn-count" id="cCount">已赛 0 / 5 局</div>
+    <div class="read-cmd" id="cSummary" style="display:none;"></div>
+    <div style="margin-top:14px;">
+      <button class="ghost-btn" id="cReset">重置五局</button>
+    </div>
+    <p class="hint-line">玩法：两位选手上台石头剪刀布，老师按真实结果点按钮；各组对照手中竞猜卡数命中局数，按奖级表就高领奖。赛前出票、开赛不改票——固定赔率的竞彩规则。</p>
   </div>
 </section>
 
@@ -248,17 +272,30 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 <!-- ═══════════ Rules ═══════════ -->
 <section class="page" id="pd">
   <div class="rule-sec card">
-    <h3>游戏 A · 奖级表（每轮每注 = 一张组票）</h3>
+    <h3>游戏 A · 奖级表（数字型 · 押 10 个字母，开出 10 个字母）</h3>
     <table>
-      <tr><th>奖级</th><th>条件</th><th class="c">分数</th><th class="c">中奖概率</th></tr>
-      <tr><td>特等 Jackpot</td><td>3 字母全中 + 猜对单词</td><td class="c"><b>+12</b></td><td class="c">约 1/74 × 猜对率</td></tr>
-      <tr><td>一等</td><td>3 字母全中</td><td class="c">+6</td><td class="c">1.3%</td></tr>
-      <tr><td>二等</td><td>恰中 2 个字母</td><td class="c">+3</td><td class="c">15.3%</td></tr>
-      <tr><td>三等</td><td>恰中 1 个字母</td><td class="c">+1</td><td class="c">46.0%</td></tr>
-      <tr><td>安慰奖</td><td>全不中</td><td class="c">+0.5</td><td class="c">37.3%</td></tr>
+      <tr><th>奖级</th><th>条件（命中数）</th><th class="c">分数</th><th class="c">纯瞎猜参考概率</th></tr>
+      <tr><td>一等奖</td><td>10 个全中</td><td class="c"><b>+10</b></td><td class="c">约 1/531 万</td></tr>
+      <tr><td>二等奖</td><td>猜中 8 个及以上</td><td class="c">+5</td><td class="c">约 0.1%</td></tr>
+      <tr><td>三等奖</td><td>猜中 6 个及以上</td><td class="c">+3</td><td class="c">约 7.4%</td></tr>
+      <tr><td>四等奖</td><td>猜中 4 个及以上</td><td class="c">+2</td><td class="c">约 41%</td></tr>
+      <tr><td>五等奖</td><td>猜中 2 个及以上</td><td class="c">+1</td><td class="c">约 66%</td></tr>
       <tr><td>附加奖</td><td>猜对单词（不论字母）</td><td class="c">+2</td><td class="c">靠实力</td></tr>
     </table>
-    <p class="hint-line">安慰奖仿自快乐 8「全不中也中奖」；附加奖仿自竞彩「靠知识不靠运气」；组票共享仿自西班牙十分之一票。</p>
+    <p class="hint-line">开出 10 个字母 = 谜底单词的字母（打乱）+ 随机字母补足；就高领奖、不叠发。会猜单词能大幅提高命中——押高频字母（E/T/A/O）在这个游戏里是真实策略，因为它们有「在单词里」+「被随机开出」两条中奖路径。附加奖仿自竞彩「靠知识不靠运气」。</p>
+  </div>
+
+  <div class="rule-sec card">
+    <h3>游戏 C · 奖级表（竞猜型 · 石头剪刀布五局竞猜）</h3>
+    <table>
+      <tr><th>奖级</th><th>条件</th><th class="c">分数</th><th class="c">纯瞎猜参考概率</th></tr>
+      <tr><td>一等奖</td><td>5 局全对</td><td class="c"><b>+10</b></td><td class="c">约 1/243</td></tr>
+      <tr><td>二等奖</td><td>猜对 4 局</td><td class="c">+5</td><td class="c">约 4%</td></tr>
+      <tr><td>三等奖</td><td>猜对 3 局</td><td class="c">+3</td><td class="c">约 16%</td></tr>
+      <tr><td>四等奖</td><td>猜对 2 局</td><td class="c">+2</td><td class="c">约 33%</td></tr>
+      <tr><td>五等奖</td><td>猜对 1 局</td><td class="c">+1</td><td class="c">约 33%</td></tr>
+    </table>
+    <p class="hint-line">赛前出票锁定 5 局预测（甲胜/平/乙胜），开赛不改票；就高领奖。固定赔率的奥秘：赔率是提前算好概率再打折定出来的——The house always wins。</p>
   </div>
 
   <div class="rule-sec card">
@@ -277,7 +314,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
     <div class="ticket">
       <b>LUCKY TICKET</b><br>
       组名 Group：________________<br>
-      幸运字母 Lucky Letters：1.______ 2.______ 3.______<br>
+      押 10 个字母：__ __ __ __ __ __ __ __ __ __<br>
       猜词 Word Guess：____________________<br>
       第____轮　得分：________
     </div>
@@ -433,17 +470,17 @@ function renderMask(){
     }
     wrap.appendChild(d);
   });
-  $("#roundTag").textContent = `第 ${state.round} 轮 · ${state.cur.w.length} 个字母`;
+  $("#roundTag").textContent = `第 ${state.round} 轮 · 单词 ${state.cur.w.length} 字母 · 开 10 球`;
   $("#wordHint").textContent = "提示：" + state.cur.h;
   $("#wordMean").textContent = state.revealed ? state.cur.w + (/[（(]/.test(state.cur.h) ? "  " + state.cur.h : "") : "";
   $("#wordSub").textContent = state.revealed
     ? ""
-    : "组内讨论 60 秒：3 个预测字母 + 猜完整单词（说英语加分）";
+    : "组内讨论：押 10 个你认为会开出的字母 + 猜完整单词（说英语加分）";
   $("#readCmd").textContent = state.revealed ? "Read after me! 全班齐读两遍 · " + state.cur.tip : "";
 }
 function renderBalls(){
   const row = $("#ballsRow"); row.innerHTML = "";
-  for(let i = 0; i < 7; i++){
+  for(let i = 0; i < 10; i++){
     if(i < state.drawn.length){
       const b = document.createElement("div");
       b.className = "ball"; b.textContent = state.drawn[i];
@@ -454,18 +491,35 @@ function renderBalls(){
       row.appendChild(s);
     }
   }
-  $("#drawnCount").textContent = `已抽 ${state.drawn.length} / 7`;
-  $("#drawBtn").disabled = state.drawn.length >= 7 || state.revealed;
+  $("#drawnCount").textContent = `已开 ${state.drawn.length} / 10`;
+  $("#drawBtn").disabled = state.drawn.length >= 10 || state.revealed;
+  $("#fastBtn").disabled = state.drawn.length >= 10 || state.revealed;
   $("#revealBtn").disabled = state.revealed;
 }
+function shuffleArr(a){
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+/* 开奖序列：谜底单词的字母（去重打乱）+ 随机字母补足，共 10 个 */
+function buildSeq(){
+  const wordLetters = [...new Set(state.cur.w.split(""))];
+  const rest = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c => !wordLetters.includes(c));
+  shuffleArr(wordLetters); shuffleArr(rest);
+  state.seq = wordLetters.concat(rest).slice(0, 10);
+}
 function drawLetter(){
-  if(state.drawn.length >= 7 || state.revealed) return;
-  const pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c => !state.drawn.includes(c));
-  const c = pool[Math.floor(Math.random() * pool.length)];
+  if(state.drawn.length >= 10 || state.revealed) return;
+  if(!state.seq || state.seq.length < 10) buildSeq();
+  const c = state.seq[state.drawn.length];
+  if(!c) return;
   state.drawn.push(c);
   beep(880); renderBalls();
-  if(state.drawn.length === 7){
+  if(state.drawn.length === 10){
     $("#drawBtn").disabled = true;
+    $("#fastBtn").disabled = true;
     setTimeout(() => beep(523,.12), 200);
     setTimeout(() => beep(784,.16), 360);
   }
@@ -479,10 +533,11 @@ function reveal(){
 function resetRound(bump = true){
   state.drawn = []; state.revealed = false;
   if(bump) state.round++;
-  renderMask(); renderBalls();
+  buildSeq(); renderMask(); renderBalls();
   $("#teacherPanel").open = false;
 }
 $("#drawBtn").onclick = drawLetter;
+$("#fastBtn").onclick = () => { while(state.drawn.length < 10 && !state.revealed) drawLetter(); };
 $("#revealBtn").onclick = reveal;
 $("#resetRoundBtn").onclick = () => resetRound(true);
 
@@ -529,6 +584,38 @@ $("#spinResetBtn").onclick = () => {
   $("#gbVerdict").classList.remove("show");
 };
 
+/* ───────── Game C ───────── */
+const cState = { results: [] };
+function cRender(){
+  const done = cState.results.length >= 5;
+  $("#cRound").textContent = Math.min(cState.results.length + 1, 5);
+  const strip = $("#cStrip"); strip.innerHTML = "";
+  for(let i = 0; i < 5; i++){
+    if(i < cState.results.length){
+      const b = document.createElement("div");
+      b.className = "ball"; b.textContent = cState.results[i];
+      strip.appendChild(b);
+    } else {
+      const s = document.createElement("div");
+      s.className = "slot"; s.textContent = i + 1;
+      strip.appendChild(s);
+    }
+  }
+  $("#cCount").textContent = `已赛 ${cState.results.length} / 5 局`;
+  $("#cOpts").style.display = done ? "none" : "flex";
+  const sum = $("#cSummary");
+  sum.style.display = done ? "block" : "none";
+  if(done){
+    sum.innerHTML = "五局结果：" + cState.results.join(" · ")
+      + "<br>各组对照竞猜卡计命中局数 —— 5对=10🌟 · 4对=5🌟 · 3对=3🌟 · 2对=2🌟 · 1对=1🌟（就高领奖，不叠发）";
+  }
+}
+function cPick(r){ if(cState.results.length >= 5) return; cState.results.push(r); beep(r === "平" ? 520 : 760); cRender(); }
+$("#cA").onclick = () => cPick("甲");
+$("#cD").onclick = () => cPick("平");
+$("#cB").onclick = () => cPick("乙");
+$("#cReset").onclick = () => { cState.results = []; cRender(); };
+
 /* ───────── Scoreboard ───────── */
 const LS_KEY = "luckyMorningScores";
 let groups = JSON.parse(localStorage.getItem(LS_KEY) || "null") || defaultGroups(6);
@@ -551,10 +638,10 @@ function renderGroups(){
     const nameEl = card.querySelector(".gname");
     nameEl.addEventListener("blur", () => { groups[i].name = nameEl.textContent.trim() || g.name; save(); });
     const quick = card.querySelector(".quick");
-    [["+12",12],["+6",6],["+3",3],["+2",2],["+1",1],["+0.5",0.5],["+10",10]].forEach(([lab,val]) => {
+    [["+10",10],["+5",5],["+3",3],["+2",2],["+1",1],["基金+10",10]].forEach(([lab,val], idx) => {
       const b = document.createElement("button");
       b.textContent = lab;
-      if(val === 10) b.classList.add("fund");
+      if(idx === 5) b.classList.add("fund");
       b.onclick = () => addScore(i, val);
       quick.appendChild(b);
     });
@@ -608,7 +695,7 @@ document.addEventListener("keydown", e => {
 });
 
 /* init */
-renderBank(); renderMask(); renderBalls(); renderGroups();
+renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender();
 </script>
 </body>
 </html>
