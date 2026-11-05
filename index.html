@@ -220,11 +220,9 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 
 <nav>
   <button data-page="pa" class="active">🎱 游戏A · 幸运字母</button>
-  <button data-page="pb">🎰 游戏B · 开奖</button>
   <button data-page="pg">✊ 游戏C · 石头剪刀布</button>
   <button data-page="pe">🤝 游戏D · 全班的希望</button>
   <button data-page="pf">🎓 常识竞猜</button>
-  <button data-page="pc">🏆 计分板</button>
   <button data-page="pd">📋 规则速查</button>
 </nav>
 
@@ -267,37 +265,22 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   </div>
 </section>
 
-<!-- ═══════════ Game B ═══════════ -->
-<section class="page" id="pb">
-  <div class="card gb-wrap">
-    <p style="color:var(--muted);font-size:15px;">数字杯 · 三张卡共用同一次开奖结果 X</p>
-    <div class="gb-ball" id="gbBall"><div class="num" id="gbNum">?</div><div class="lab">THE DRAW</div></div>
-    <button class="big-btn" id="spinBtn">开 奖（空格）</button>
-    <button class="ghost-btn" id="spinResetBtn" style="margin-left:10px;">重置</button>
-    <div class="gb-verdict" id="gbVerdict"></div>
-    <p class="hint-line">开奖后按下方判定领分；建议把各组押卡情况写在黑板，开奖时全班一起喊。</p>
-  </div>
-</section>
-
 <!-- ═══════════ Game C ═══════════ -->
 <section class="page" id="pg">
   <div class="card" style="text-align:center;">
-    <div class="round-tag">第 <span id="cRound">1</span> 局 / 2 · 站在选手甲视角记两局结果（甲胜=胜 · 平=平 · 乙胜=负）</div>
-    <div class="pool-bar">🏆 奖池 <b id="cPool">0</b>🌟 ｜ <span id="cBets">0</span> 注 × 2🌟</div>
-    <div class="grid9" id="cGrid"></div>
-    <p class="hint-line" style="margin:4px 0 12px;">九选一（第1局·第2局）：各组赛前押 1 注 2🌟，老师点对应格子「+」计注、可「−」修正</p>
+    <div class="round-tag">第 <span id="cRound">1</span> 局 / 5 · 各组竞猜卡已赛前锁定（甲胜 / 平 / 乙胜 × 5 局）</div>
     <div class="c-strip" id="cStrip"></div>
     <div class="rps-opts" id="cOpts">
-      <button class="big-btn gold" id="cA">甲 胜</button>
+      <button class="big-btn gold" id="cA">选手甲 胜</button>
       <button class="big-btn" id="cD">平 局</button>
-      <button class="big-btn" id="cB">乙 胜</button>
+      <button class="big-btn" id="cB">选手乙 胜</button>
     </div>
-    <div class="drawn-count" id="cCount">已赛 0 / 2 局</div>
+    <div class="drawn-count" id="cCount">已赛 0 / 5 局</div>
     <div class="read-cmd" id="cSummary" style="display:none;"></div>
     <div style="margin-top:14px;">
-      <button class="ghost-btn" id="cReset">重置本轮</button>
+      <button class="ghost-btn" id="cReset">重置五局</button>
     </div>
-    <p class="hint-line">两局比完自动结算：<b>两局全中的注按权重 4 瓜分整个奖池，只对一局的注按权重 1 参与瓜分</b>；全场无人沾边则奖池滚存下一轮。全班互相对赌、庄家零抽水——这就是赛马与快乐 8 浮动奖的 Pari-mutuel（彩池瓜分）机制，与游戏 B 的固定赔率构成对照组。计分板每组卡片有「自定」加分区，用于发放瓜分奖金。</p>
+    <p class="hint-line">两位选手石头剪刀布五局，老师按真实结果点按钮记录；各组对照赛前竞猜卡计命中局数，按统一奖级表就高领奖：5对=10🌟 · 4对=5🌟 · 3对=4🌟 · 2对=3🌟 · 1对=2🌟。<b>未领取奖金注入班级奖池。</b></p>
   </div>
 </section>
 
@@ -330,7 +313,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 <!-- ═══════════ 常识竞猜 ═══════════ -->
 <section class="page" id="pf">
   <div class="card">
-    <div class="round-tag">彩票趣味常识竞猜 · 第 <span id="qIdx">1</span> / 12 题 · 全班抢答，答对组去计分板 +1</div>
+    <div class="round-tag">彩票趣味常识竞猜 · 第 <span id="qIdx">1</span> / 12 题 · 全班抢答，答对者得 2🌟（五等奖同款），奖池期末兑奖</div>
     <div class="q-progress" id="qDots"></div>
     <div class="q-text" id="qText"></div>
     <div class="q-opts" id="qOpts"></div>
@@ -344,50 +327,23 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   </div>
 </section>
 
-<!-- ═══════════ Scoreboard ═══════════ -->
-<section class="page" id="pc">
-  <div class="sb-tools">
-    <button class="ghost-btn" id="fundAll">全体发放开局基金 +10</button>
-    <button class="ghost-btn" id="clearAll">全部清零</button>
-    <span style="color:var(--muted);font-size:14px;">组数</span>
-    <button class="ghost-btn gnum" data-n="6">6</button>
-    <button class="ghost-btn gnum" data-n="8">8</button>
-    <button class="ghost-btn gnum" data-n="10">10</button>
-    <span class="sep"></span>
-    <span style="color:var(--muted);font-size:13px;">自动保存在本机 · 下课记得宣布清零</span>
-  </div>
-  <div class="groups" id="groups"></div>
-  <div class="logbox" id="logBox"></div>
-</section>
-
 <!-- ═══════════ Rules ═══════════ -->
 <section class="page" id="pd">
-  <div class="rule-sec card">
-    <h3>游戏 A · 奖级表（数字型 · 按顺序押 10 位，开出 10 个字母）</h3>
-    <table>
-      <tr><th>奖级</th><th>条件（按位命中）</th><th class="c">分数</th><th class="c">量级估计（会猜单词，5 字母词）</th></tr>
-      <tr><td>一等奖</td><td>10 位全对（字母+顺序）</td><td class="c"><b>+10</b></td><td class="c">约五亿分之一</td></tr>
-      <tr><td>二等奖</td><td>按位猜对 8 位及以上</td><td class="c">+5</td><td class="c">约十万分之一</td></tr>
-      <tr><td>三等奖</td><td>按位猜对 6 位及以上</td><td class="c">+3</td><td class="c">约千分之二</td></tr>
-      <tr><td>四等奖</td><td>按位猜对 4 位及以上</td><td class="c">+2</td><td class="c">约 3%</td></tr>
-      <tr><td>五等奖</td><td>按位猜对 2 位及以上</td><td class="c">+1</td><td class="c">约 1/3</td></tr>
-      <tr><td>附加奖</td><td>猜对单词（不论字母）</td><td class="c">+2</td><td class="c">靠实力</td></tr>
-    </table>
-    <p class="hint-line">开出 10 个字母 = <b>前段随机字母（10−L 个）+ 后段谜底单词字母（L 个，L=单词字母数，顺序打乱）</b>，仿双色球红蓝分区，分界随单词长度调整；就高领奖、不叠发。<b>命中 = 字母和位置都对（直选式）</b>——猜出单词只锁定后段「是哪些字母」，锁不住「什么顺序」，前段则完全靠运气。对比真彩种：这种按位直选的难度超过了双色球头奖（1/1772 万）。附加奖仿自竞彩「靠知识不靠运气」。</p>
+  <div class="rule-sec card" style="border:2px solid var(--gold);background:#FDF6E7;">
+    <p style="font-size:16px;line-height:1.9;">🍂 秋季学期马上结束了，语言游戏为了答谢正音课学员，特别开设<b>幸运彩票早练</b>，<b>返奖率超过 100%</b>，欢迎各位玩家参与！（最终解释权归语言游戏所有）</p>
   </div>
 
   <div class="rule-sec card">
-    <h3>游戏 C · 规则（竞猜型 · 石头剪刀布两局 · 彩池瓜分）</h3>
+    <h3>统一奖级表（竞猜型 + 数字型 · 就高领奖，不叠发）</h3>
     <table>
-      <tr><th style="width:90px;">项目</th><th>规则</th></tr>
-      <tr><td>选项</td><td>九选一（第1局·第2局，站在选手甲视角）：胜胜 / 胜平 / 胜负 / 平胜 / 平平 / 平负 / 负胜 / 负平 / 负负</td></tr>
-      <tr><td>下注</td><td>每组赛前押 1 注（2🌟）于一个组合，开赛不改票；奖池 = 全部注金</td></tr>
-      <tr><td>全中</td><td>两局结果全对（概率 1/9）→ 权重 4，参与瓜分</td></tr>
-      <tr><td>对一局</td><td>只对一局（至少对一局概率 5/9）→ 权重 1，参与瓜分</td></tr>
-      <tr><td>瓜分</td><td>每注得分 = 奖池 × 权重 ÷ 总权重，庄家零抽水，奖金全部来自彼此</td></tr>
-      <tr><td>滚存</td><td>全场无人沾边 → 奖池滚存下一轮</td></tr>
+      <tr><th>奖项</th><th>竞猜型玩法</th><th>数字型玩法</th><th class="c">奖金</th></tr>
+      <tr><td>一等奖</td><td>5 局全部猜对</td><td>10 个全中</td><td class="c"><b>10🌟</b></td></tr>
+      <tr><td>二等奖</td><td>猜对 4 局</td><td>猜中 8 个</td><td class="c">5🌟</td></tr>
+      <tr><td>三等奖</td><td>猜对 3 局</td><td>猜中 6 个</td><td class="c">4🌟</td></tr>
+      <tr><td>四等奖</td><td>猜对 2 局</td><td>猜中 4 个</td><td class="c">3🌟</td></tr>
+      <tr><td>五等奖</td><td>猜对 1 局</td><td>猜中 2 个</td><td class="c">2🌟</td></tr>
     </table>
-    <p class="hint-line">示例：8 注共 16🌟 奖池，2 注全中、3 注对一局 → 总权重 2×4+3×1=11；全中每注 16×4÷11≈5.8🌟，对一局每注≈1.5🌟。这是 Pari-mutuel（彩池瓜分）：快乐 8 的浮动奖、赛马投注都是这一类——与游戏 B「固定赔率、庄家抽水」互为对照组。</p>
+    <p class="hint-line">数字型：开出 10 个字母 = 前段随机字母 + 后段谜底单词字母（打乱、长度随单词调整）；<b>按顺序押 10 位，字母和位置都对才算命中</b>；猜对单词另 +2🌟（语言加奖，不计档）。<b>两种玩法未领取的奖金一律注入班级奖池</b>，滚存到期末统一兑奖——这正是真彩票的奖池滚存机制。</p>
   </div>
 
   <div class="rule-sec card">
@@ -405,17 +361,6 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
   </div>
 
   <div class="rule-sec card">
-    <h3>游戏 B · 三张卡（开奖号 X ∈ 0–9）</h3>
-    <table>
-      <tr><th>卡名</th><th>押法</th><th>中了</th><th>没中</th></tr>
-      <tr><td>卡 1 · 稳稳的幸福</td><td>押大（5–9）或小（0–4）</td><td>赔 1.6 倍</td><td>归零</td></tr>
-      <tr><td>卡 2 · 一夜暴富</td><td>押 0–9 一个具体数字</td><td>赔 5 倍</td><td>归零</td></tr>
-      <tr><td>卡 3 · 全村的希望</td><td>全组共押同一数字（拼整票）</td><td>赔 5 倍组内平分</td><td>与 X 相邻（±1）退一半本金</td></tr>
-    </table>
-    <p class="hint-line">期望值：卡 1 = 0.8、卡 3 = 0.6（押 0/9 为 0.55）、卡 2 = 0.5 —— The house always wins.</p>
-  </div>
-
-  <div class="rule-sec card">
     <h3>组票票样（学生照此画在草稿纸上即可）</h3>
     <div class="ticket">
       <b>LUCKY TICKET</b><br>
@@ -428,7 +373,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 </section>
 
 </main>
-<footer>幸运早练 · 20 分钟跨学科活动课 · 积分下课清零，未满 18 周岁不得购买彩票</footer>
+<footer>幸运彩票早练 · 语言游戏正音课期末答谢场 · 奖池期末统一兑奖 · 未满 18 周岁不得购买彩票</footer>
 
 <script>
 /* ───────── state & helpers ───────── */
@@ -438,7 +383,7 @@ const WORDS = [
   {w:"LUCK",    h:"运气（名词）",           ph:"/lʌk/",           tip:"Good luck! 祝你好运", lv:1},
   {w:"WIN",     h:"赢；获胜（动词）",       ph:"/wɪn/",           tip:"win the game 赢下比赛", lv:1},
   {w:"GAME",    h:"游戏（名词）",           ph:"/ɡeɪm/",          tip:"play games", lv:1},
-  {w:"STAR",    h:"星；明星（名词）",       ph:"/stɑː(r)/",       tip:"a lucky star 幸运星", lv:1},
+  {w:"STAR",    h:"星；明星（名词）",       ph:"/stɑː/",       tip:"a lucky star 幸运星", lv:1},
   {w:"GOLD",    h:"金子（名词）",           ph:"/ɡəʊld/",         tip:"gold medal 金牌", lv:1},
   {w:"COIN",    h:"硬币（名词）",           ph:"/kɔɪn/",          tip:"flip a coin 抛硬币", lv:1},
   {w:"RICH",    h:"富有的（形容词）",       ph:"/rɪtʃ/",          tip:"get rich 变富", lv:1},
@@ -452,7 +397,7 @@ const WORDS = [
   {w:"TICKET",  h:"票（名词）",             ph:"/ˈtɪkɪt/",        tip:"a lottery ticket 一张彩票", lv:1},
   {w:"HAPPY",   h:"快乐的（形容词）",       ph:"/ˈhæpi/",         tip:"happy → happiness", lv:1},
   /* ── ② 进阶 · 6–8 字母 ── */
-  {w:"WINNER",  h:"赢家（名词）",           ph:"/ˈwɪnə(r)/",      tip:"be a winner", lv:2},
+  {w:"WINNER",  h:"赢家（名词）",           ph:"/ˈwɪnə/",      tip:"be a winner", lv:2},
   {w:"CHANCE",  h:"机会（名词）",           ph:"/tʃɑːns/",        tip:"a chance to win", lv:2},
   {w:"BONUS",   h:"奖金（名词）",           ph:"/ˈbəʊnəs/",       tip:"year-end bonus 年终奖", lv:2},
   {w:"WEALTH",  h:"财富（名词）",           ph:"/welθ/",          tip:"health is wealth", lv:2},
@@ -467,7 +412,7 @@ const WORDS = [
   {w:"WINNING", h:"获胜的（形容词）",       ph:"/ˈwɪnɪŋ/",        tip:"the winning number 中奖号码", lv:2},
   {w:"DIAMOND", h:"钻石（名词）",           ph:"/ˈdaɪəmənd/",     tip:"diamonds are forever", lv:2},
   {w:"VICTORY", h:"胜利（名词）",           ph:"/ˈvɪktəri/",      tip:"V for Victory", lv:2},
-  {w:"TREASURE",h:"宝藏（名词）",           ph:"/ˈtreʒə(r)/",     tip:"treasure hunt 寻宝", lv:2},
+  {w:"TREASURE",h:"宝藏（名词）",           ph:"/ˈtreʒə/",     tip:"treasure hunt 寻宝", lv:2},
   /* ── ③ 高阶 · 8 字母以上 ── */
   {w:"BIRTHDAY",   h:"生日（名词）",         ph:"/ˈbɜːθdeɪ/",      tip:"生日号不会更容易中——概率错觉彩蛋", lv:3},
   {w:"GAMBLING",   h:"赌博（名词）",         ph:"/ˈɡæmblɪŋ/",     tip:"gamble → gambling", lv:3},
@@ -475,10 +420,10 @@ const WORDS = [
   {w:"CHAMPION",   h:"冠军（名词）",         ph:"/ˈtʃæmpiən/",    tip:"win the championship", lv:3},
   {w:"FORTUNATE",  h:"幸运的（形容词）",     ph:"/ˈfɔːtʃənət/",   tip:"fortune → fortunately", lv:3},
   {w:"LUCKILY",    h:"幸运地（副词）",       ph:"/ˈlʌkɪli/",      tip:"Luckily, no one was hurt.", lv:3},
-  {w:"SUPERSTAR",  h:"超级明星（名词）",     ph:"/ˈsuːpəstɑː(r)/", tip:"star → superstar", lv:3},
+  {w:"SUPERSTAR",  h:"超级明星（名词）",     ph:"/ˈsuːpəstɑː/", tip:"star → superstar", lv:3},
   {w:"CONFIDENT",  h:"自信的（形容词）",     ph:"/ˈkɒnfɪdənt/",   tip:"be confident of", lv:3},
   {w:"FANTASTIC",  h:"极好的（形容词）",     ph:"/fænˈtæstɪk/",   tip:"a fantastic prize", lv:3},
-  {w:"MILLIONAIRE",h:"百万富翁（名词）",     ph:"/ˌmɪljəˈneə(r)/", tip:"million → millionaire", lv:3},
+  {w:"MILLIONAIRE",h:"百万富翁（名词）",     ph:"/ˌmɪljəˈneə/", tip:"million → millionaire", lv:3},
   {w:"PROBABILITY",h:"概率（名词）",         ph:"/ˌprɒbəˈbɪləti/", tip:"in all probability 十有八九", lv:3},
   {w:"PSYCHOLOGY", h:"心理学（名词）",       ph:"/saɪˈkɒlədʒi/",   tip:"consumer psychology 消费心理", lv:3},
   {w:"INCREDIBLE", h:"难以置信的（形容词）", ph:"/ɪnˈkredəbl/",   tip:"an incredible story", lv:3},
@@ -651,141 +596,38 @@ $("#fastBtn").onclick = () => { while(state.drawn.length < 10 && !state.revealed
 $("#revealBtn").onclick = reveal;
 $("#resetRoundBtn").onclick = () => resetRound(true);
 
-/* ───────── Game B ───────── */
-let spinning = false;
-function spin(){
-  if(spinning) return;
-  spinning = true;
-  const ball = $("#gbBall"), num = $("#gbNum");
-  ball.classList.add("rolling");
-  $("#gbVerdict").classList.remove("show");
-  const result = Math.floor(Math.random() * 10);
-  let t = 0, delay = 55, elapsed = 0;
-  const total = 2100;
-  (function tick(){
-    num.textContent = Math.floor(Math.random() * 10);
-    beep(300 + Math.random()*80, .03, "square", .05);
-    elapsed += delay;
-    delay = 55 + Math.pow(elapsed / total, 2.6) * 420;
-    if(elapsed < total){ setTimeout(tick, delay); }
-    else{
-      num.textContent = result;
-      ball.classList.remove("rolling");
-      [659,880].forEach((f,i)=>setTimeout(()=>beep(f,.2,"sine",.15), i*130));
-      showVerdict(result);
-      spinning = false;
-    }
-  })();
-}
-function showVerdict(x){
-  const big = x >= 5;
-  const neigh = [x-1, x+1].filter(n => n >= 0 && n <= 9);
-  const v = $("#gbVerdict");
-  v.innerHTML = `
-    <div class="row ${big?"win":""}"><b>卡 1</b><span>开奖 ${x} 属「${big?"大（5–9）":"小（0–4）"}」—— 押${big?"大":"小"}的组：10 分 × 1.6 = <b>16 分</b></span></div>
-    <div class="row"><b>卡 2</b><span>押数字 <b>${x}</b> 的组：10 分 × 5 = <b>50 分</b></span></div>
-    <div class="row"><b>卡 3</b><span>押 <b>${x}</b> 的组：50 分组内平分；押 <b>${neigh.join("、")}</b> 的组：退回一半本金（5 分）</span></div>
-    <div class="row"><b>揭底</b><span>三张卡期望：卡1 = 0.8 · 卡3 = 0.6 · 卡2 = 0.5 —— The house always wins.</span></div>`;
-  v.classList.add("show");
-}
-$("#spinBtn").onclick = spin;
-$("#spinResetBtn").onclick = () => {
-  $("#gbNum").textContent = "?";
-  $("#gbVerdict").classList.remove("show");
-};
-
-/* ───────── Game C：两局九选一 · 彩池瓜分 ───────── */
-const C_R = ["胜", "平", "负"];
-const cState = { bets: Array(9).fill(0), results: [] };
-function cHits(i){
-  const r1 = C_R[Math.floor(i / 3)] === cState.results[0];
-  const r2 = C_R[i % 3] === cState.results[1];
-  return (r1 ? 1 : 0) + (r2 ? 1 : 0);
-}
-function cSettle(){
-  const pool = cState.bets.reduce((s, n) => s + n, 0) * 2;
-  let totalW = 0;
-  cState.bets.forEach((n, i) => {
-    const h = cHits(i);
-    totalW += n * (h === 2 ? 4 : h === 1 ? 1 : 0);
-  });
-  return { pool, totalW };
-}
+/* ───────── Game C：五局竞猜 ───────── */
+const cState = { results: [] };
 function cRender(){
-  const done = cState.results.length >= 2;
-  $("#cRound").textContent = Math.min(cState.results.length + 1, 2);
-  const grid = $("#cGrid"); grid.innerHTML = "";
-  const st = done ? cSettle() : null;
-  const perFull = st && st.totalW ? st.pool * 4 / st.totalW : 0;
-  const perOne  = st && st.totalW ? st.pool * 1 / st.totalW : 0;
-  for(let i = 0; i < 9; i++){
-    const cell = document.createElement("div");
-    cell.className = "g9";
-    let tag = "";
-    if(done){
-      const h = cHits(i);
-      if(h === 2){ cell.classList.add("win"); tag = "全中"; }
-      else if(h === 1){ cell.classList.add("near"); tag = "对1局"; }
-    }
-    const combo = document.createElement("div");
-    combo.className = "combo"; combo.textContent = C_R[Math.floor(i / 3)] + C_R[i % 3];
-    const cnt = document.createElement("div");
-    cnt.className = "cnt"; cnt.textContent = cState.bets[i] + " 注";
-    const row = document.createElement("div");
-    const minus = document.createElement("button");
-    minus.className = "mini"; minus.textContent = "−";
-    minus.onclick = () => { if(cState.bets[i] > 0){ cState.bets[i]--; beep(320,.05); cRender(); } };
-    const plus = document.createElement("button");
-    plus.className = "mini"; plus.textContent = "+";
-    plus.onclick = () => { cState.bets[i]++; beep(660,.05); cRender(); };
-    row.appendChild(minus); row.appendChild(plus);
-    if(tag){ const t = document.createElement("div"); t.className = "tag"; t.textContent = tag; cell.appendChild(t); }
-    cell.appendChild(combo); cell.appendChild(cnt); cell.appendChild(row);
-    grid.appendChild(cell);
-  }
-  const bets = cState.bets.reduce((s, n) => s + n, 0);
-  $("#cPool").textContent = bets * 2;
-  $("#cBets").textContent = bets;
+  const done = cState.results.length >= 5;
+  $("#cRound").textContent = Math.min(cState.results.length + 1, 5);
   const strip = $("#cStrip"); strip.innerHTML = "";
-  for(let i = 0; i < 2; i++){
+  for(let i = 0; i < 5; i++){
     if(i < cState.results.length){
       const b = document.createElement("div");
       b.className = "ball"; b.textContent = cState.results[i];
       strip.appendChild(b);
     } else {
       const s = document.createElement("div");
-      s.className = "slot"; s.textContent = "第" + (i + 1) + "局";
+      s.className = "slot"; s.textContent = i + 1;
       strip.appendChild(s);
     }
   }
-  $("#cCount").textContent = `已赛 ${cState.results.length} / 2 局`;
+  $("#cCount").textContent = `已赛 ${cState.results.length} / 5 局`;
   $("#cOpts").style.display = done ? "none" : "flex";
   const sum = $("#cSummary");
   sum.style.display = done ? "block" : "none";
   if(done){
-    if(st.totalW === 0){
-      sum.innerHTML = `两局结果：${cState.results.join(" · ")}——全场无人沾边，奖池 <b>${st.pool}</b>🌟 滚存下一轮！（真彩票的奖池就是这样攒起来的）`;
-    } else {
-      const fullBets = cState.bets[cIdxOfResult()];
-      const oneBets = cState.bets.reduce((s, n, i) => s + (cHits(i) === 1 ? n : 0), 0);
-      sum.innerHTML = `两局结果：${cState.results.join(" · ")}｜奖池 ${st.pool}🌟 按接近程度瓜分：<br>`
-        + `全中「${cState.results.join("")}」${fullBets} 注，每注 <b>+${perFull.toFixed(1)}</b>🌟`
-        + (oneBets ? ` ｜ 对一局 ${oneBets} 注，每注 <b>+${perOne.toFixed(1)}</b>🌟` : "");
-      [659, 880, 1046].forEach((f, k) => setTimeout(() => beep(f, .15, "sine", .14), k * 130));
-    }
+    sum.innerHTML = "五局结果：" + cState.results.join(" · ")
+      + " —— 对照奖级：5对=10🌟 · 4对=5🌟 · 3对=4🌟 · 2对=3🌟 · 1对=2🌟（就高领奖，不叠发）";
+    [659, 880, 1046].forEach((f, k) => setTimeout(() => beep(f, .15, "sine", .14), k * 130));
   }
 }
-function cIdxOfResult(){ return C_R.indexOf(cState.results[0]) * 3 + C_R.indexOf(cState.results[1]); }
-function cPick(r){
-  if(cState.results.length >= 2) return;
-  cState.results.push(r);
-  beep(r === "平" ? 520 : 760);
-  cRender();
-}
-$("#cA").onclick = () => cPick("胜");
+function cPick(r){ if(cState.results.length >= 5) return; cState.results.push(r); beep(r === "平" ? 520 : 760); cRender(); }
+$("#cA").onclick = () => cPick("甲");
 $("#cD").onclick = () => cPick("平");
-$("#cB").onclick = () => cPick("负");
-$("#cReset").onclick = () => { cState.bets = Array(9).fill(0); cState.results = []; cRender(); };
+$("#cB").onclick = () => cPick("乙");
+$("#cReset").onclick = () => { cState.results = []; cRender(); };
 
 /* ───────── Game D：共享型 · 最近数字瓜分 ───────── */
 const dState = { students: [], result: null };
@@ -957,84 +799,6 @@ $("#qReveal").onclick = () => {
 $("#qPrev").onclick = () => { if(qi > 0){ qi--; qRender(); } };
 $("#qNext").onclick = () => { if(qi < QUIZ.length - 1){ qi++; qRender(); } };
 
-/* ───────── Scoreboard ───────── */
-const LS_KEY = "luckyMorningScores";
-let groups = JSON.parse(localStorage.getItem(LS_KEY) || "null") || defaultGroups(6);
-let ops = [];
-function defaultGroups(n){
-  return Array.from({length:n}, (_,i) => ({name:"第 " + (i+1) + " 组", score:0}));
-}
-function save(){ localStorage.setItem(LS_KEY, JSON.stringify(groups)); }
-function renderGroups(){
-  const box = $("#groups"); box.innerHTML = "";
-  groups.forEach((g, i) => {
-    const card = document.createElement("div");
-    card.className = "g-card";
-    card.innerHTML = `
-      <div class="top">
-        <span class="gname" contenteditable="plaintext-only" spellcheck="false">${g.name}</span>
-        <span class="score ${g.score<0?"neg":""}">${g.score}</span>
-      </div>
-      <div class="quick"></div>`;
-    const nameEl = card.querySelector(".gname");
-    nameEl.addEventListener("blur", () => { groups[i].name = nameEl.textContent.trim() || g.name; save(); });
-    const quick = card.querySelector(".quick");
-    [["+10",10],["+5",5],["+3",3],["+2",2],["+1",1],["基金+10",10]].forEach(([lab,val], idx) => {
-      const b = document.createElement("button");
-      b.textContent = lab;
-      if(idx === 5) b.classList.add("fund");
-      b.onclick = () => addScore(i, val);
-      quick.appendChild(b);
-    });
-    const minus = document.createElement("button");
-    minus.textContent = "−1"; minus.className = "minus";
-    minus.onclick = () => addScore(i, -1);
-    quick.appendChild(minus);
-    const inp = document.createElement("input");
-    inp.type = "number"; inp.step = "0.1"; inp.placeholder = "自定";
-    inp.addEventListener("keydown", e => { if(e.key === "Enter"){ addBtn.click(); } });
-    const addBtn = document.createElement("button");
-    addBtn.textContent = "加";
-    addBtn.onclick = () => {
-      const v = parseFloat(inp.value);
-      if(!isNaN(v) && v !== 0){ addScore(i, Math.round(v * 10) / 10); inp.value = ""; }
-    };
-    quick.appendChild(inp); quick.appendChild(addBtn);
-    box.appendChild(card);
-  });
-  renderLog();
-}
-function addScore(i, val){
-  groups[i].score = Math.round((groups[i].score + val) * 10) / 10;
-  ops.push({i, val});
-  save(); renderGroups();
-  const el = $("#groups").children[i]?.querySelector(".score");
-  if(el){ el.classList.add("bump"); setTimeout(()=>el.classList.remove("bump"), 160); }
-  beep(val > 0 ? 720 : 320, .07);
-}
-function renderLog(){
-  const box = $("#logBox");
-  box.innerHTML = ops.length
-    ? "最近操作：" + ops.slice(-5).map(o => `${groups[o.i].name} ${o.val>0?"+":""}${o.val}`).join("、")
-      + '<span class="undo" id="undoBtn">撤销上一步</span>'
-    : "";
-  const u = $("#undoBtn");
-  if(u) u.onclick = () => {
-    const o = ops.pop();
-    if(!o) return;
-    groups[o.i].score = Math.round((groups[o.i].score - o.val) * 10) / 10;
-    save(); renderGroups();
-  };
-}
-$("#fundAll").onclick = () => { groups.forEach(g => g.score += 10); save(); renderGroups(); beep(880,.15); };
-$("#clearAll").onclick = () => {
-  if(confirm("确认把所有组清零吗？")){ groups.forEach(g => g.score = 0); ops = []; save(); renderGroups(); }
-};
-document.querySelectorAll(".gnum").forEach(b => b.onclick = () => {
-  const n = +b.dataset.n;
-  groups = defaultGroups(n); ops = []; save(); renderGroups();
-});
-
 /* ───────── keyboard ───────── */
 document.addEventListener("keydown", e => {
   if(e.code !== "Space") return;
@@ -1042,11 +806,10 @@ document.addEventListener("keydown", e => {
   if(tag === "INPUT" || document.activeElement.isContentEditable) return;
   e.preventDefault();
   if($("#pa").classList.contains("active")) drawLetter();
-  else if($("#pb").classList.contains("active")) spin();
 });
 
 /* init */
-renderBank(); buildSeq(); renderMask(); renderBalls(); renderGroups(); cRender(); dRender(); qRender();
+renderBank(); buildSeq(); renderMask(); renderBalls(); cRender(); dRender(); qRender();
 </script>
 </body>
 </html>
