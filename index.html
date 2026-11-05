@@ -219,7 +219,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
         <button class="ghost-btn" id="resetRoundBtn">重置本轮</button>
       </div>
       <div class="read-cmd" id="readCmd"></div>
-      <p class="hint-line">开出 10 个字母 = <b>前段随机字母 + 后段谜底单词字母</b>（仿双色球分区，两段长度随单词长度调整）。命中数 = 你押的 10 个字母与开出 10 个字母的重合个数，对照规则速查页奖级表就高领奖；猜对单词另有附加奖。</p>
+      <p class="hint-line">开出 10 个字母 = <b>前段随机字母 + 后段谜底单词字母（顺序打乱）</b>，仿双色球分区、两段长度随单词长度调整。组票按顺序填 10 位预测；<b>命中 = 字母和位置都对</b>（直选式），对照规则速查页奖级表就高领奖；猜对单词另有附加奖。</p>
     </div>
   </div>
 </section>
@@ -274,17 +274,17 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 <!-- ═══════════ Rules ═══════════ -->
 <section class="page" id="pd">
   <div class="rule-sec card">
-    <h3>游戏 A · 奖级表（数字型 · 押 10 个字母，开出 10 个字母）</h3>
+    <h3>游戏 A · 奖级表（数字型 · 按顺序押 10 位，开出 10 个字母）</h3>
     <table>
-      <tr><th>奖级</th><th>条件（命中数）</th><th class="c">分数</th><th class="c">纯瞎猜参考概率</th></tr>
-      <tr><td>一等奖</td><td>10 个全中</td><td class="c"><b>+10</b></td><td class="c">约 1/531 万</td></tr>
-      <tr><td>二等奖</td><td>猜中 8 个及以上</td><td class="c">+5</td><td class="c">约 0.1%</td></tr>
-      <tr><td>三等奖</td><td>猜中 6 个及以上</td><td class="c">+3</td><td class="c">约 7.4%</td></tr>
-      <tr><td>四等奖</td><td>猜中 4 个及以上</td><td class="c">+2</td><td class="c">约 41%</td></tr>
-      <tr><td>五等奖</td><td>猜中 2 个及以上</td><td class="c">+1</td><td class="c">约 66%</td></tr>
+      <tr><th>奖级</th><th>条件（按位命中）</th><th class="c">分数</th><th class="c">量级估计（会猜单词，5 字母词）</th></tr>
+      <tr><td>一等奖</td><td>10 位全对（字母+顺序）</td><td class="c"><b>+10</b></td><td class="c">约五亿分之一</td></tr>
+      <tr><td>二等奖</td><td>按位猜对 8 位及以上</td><td class="c">+5</td><td class="c">约十万分之一</td></tr>
+      <tr><td>三等奖</td><td>按位猜对 6 位及以上</td><td class="c">+3</td><td class="c">约千分之二</td></tr>
+      <tr><td>四等奖</td><td>按位猜对 4 位及以上</td><td class="c">+2</td><td class="c">约 3%</td></tr>
+      <tr><td>五等奖</td><td>按位猜对 2 位及以上</td><td class="c">+1</td><td class="c">约 1/3</td></tr>
       <tr><td>附加奖</td><td>猜对单词（不论字母）</td><td class="c">+2</td><td class="c">靠实力</td></tr>
     </table>
-    <p class="hint-line">开出 10 个字母 = <b>前段随机字母（10−L 个）+ 后段谜底单词字母（L 个，L=单词字母数）</b>，仿双色球红蓝分区，分界随单词长度调整；就高领奖、不叠发。<b>后段必开单词字母——猜出单词 ≈ 锁定后段</b>，押 E/T/A/O 依然聪明：它们大概率在单词里。附加奖仿自竞彩「靠知识不靠运气」。</p>
+    <p class="hint-line">开出 10 个字母 = <b>前段随机字母（10−L 个）+ 后段谜底单词字母（L 个，L=单词字母数，顺序打乱）</b>，仿双色球红蓝分区，分界随单词长度调整；就高领奖、不叠发。<b>命中 = 字母和位置都对（直选式）</b>——猜出单词只锁定后段「是哪些字母」，锁不住「什么顺序」，前段则完全靠运气。对比真彩种：这种按位直选的难度超过了双色球头奖（1/1772 万）。附加奖仿自竞彩「靠知识不靠运气」。</p>
   </div>
 
   <div class="rule-sec card">
@@ -316,7 +316,7 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
     <div class="ticket">
       <b>LUCKY TICKET</b><br>
       组名 Group：________________<br>
-      押 10 个字母：__ __ __ __ __ __ __ __ __ __<br>
+      按顺序押 10 位：①__ ②__ ③__ ④__ ⑤__ ⑥__ ⑦__ ⑧__ ⑨__ ⑩__<br>
       猜词 Word Guess：____________________<br>
       第____轮　得分：________
     </div>
@@ -331,54 +331,54 @@ kbd{background:var(--surface); border:1px solid var(--line); border-radius:5px; 
 const $ = s => document.querySelector(s);
 const WORDS = [
   /* ── ① 基础热身 · 4–6 字母 ── */
-  {w:"LUCK",    h:"运气（名词）",           tip:"Good luck! 祝你好运", lv:1},
-  {w:"WIN",     h:"赢；获胜（动词）",       tip:"win the game 赢下比赛", lv:1},
-  {w:"GAME",    h:"游戏（名词）",           tip:"play games", lv:1},
-  {w:"STAR",    h:"星；明星（名词）",       tip:"a lucky star 幸运星", lv:1},
-  {w:"GOLD",    h:"金子（名词）",           tip:"gold medal 金牌", lv:1},
-  {w:"COIN",    h:"硬币（名词）",           tip:"flip a coin 抛硬币", lv:1},
-  {w:"RICH",    h:"富有的（形容词）",       tip:"get rich 变富", lv:1},
-  {w:"WISH",    h:"愿望；许愿（名/动词）",  tip:"make a wish 许个愿", lv:1},
-  {w:"HOPE",    h:"希望（名/动词）",        tip:"hope for the best", lv:1},
-  {w:"GIFT",    h:"礼物（名词）",           tip:"a free gift", lv:1},
-  {w:"DREAM",   h:"梦想（名词）",           tip:"dream big 心有多大梦有多大", lv:1},
-  {w:"MONEY",   h:"钱（名词）",             tip:"Time is money.", lv:1},
-  {w:"LUCKY",   h:"幸运的（形容词）",       tip:"luck → lucky，Good luck!", lv:1},
-  {w:"PRIZE",   h:"奖品（名词）",           tip:"win a prize 获奖啦", lv:1},
-  {w:"TICKET",  h:"票（名词）",             tip:"a lottery ticket 一张彩票", lv:1},
-  {w:"HAPPY",   h:"快乐的（形容词）",       tip:"happy → happiness", lv:1},
+  {w:"LUCK",    h:"运气（名词）",           ph:"/lʌk/",           tip:"Good luck! 祝你好运", lv:1},
+  {w:"WIN",     h:"赢；获胜（动词）",       ph:"/wɪn/",           tip:"win the game 赢下比赛", lv:1},
+  {w:"GAME",    h:"游戏（名词）",           ph:"/ɡeɪm/",          tip:"play games", lv:1},
+  {w:"STAR",    h:"星；明星（名词）",       ph:"/stɑː(r)/",       tip:"a lucky star 幸运星", lv:1},
+  {w:"GOLD",    h:"金子（名词）",           ph:"/ɡəʊld/",         tip:"gold medal 金牌", lv:1},
+  {w:"COIN",    h:"硬币（名词）",           ph:"/kɔɪn/",          tip:"flip a coin 抛硬币", lv:1},
+  {w:"RICH",    h:"富有的（形容词）",       ph:"/rɪtʃ/",          tip:"get rich 变富", lv:1},
+  {w:"WISH",    h:"愿望；许愿（名/动词）",  ph:"/wɪʃ/",           tip:"make a wish 许个愿", lv:1},
+  {w:"HOPE",    h:"希望（名/动词）",        ph:"/həʊp/",          tip:"hope for the best", lv:1},
+  {w:"GIFT",    h:"礼物（名词）",           ph:"/ɡɪft/",          tip:"a free gift", lv:1},
+  {w:"DREAM",   h:"梦想（名词）",           ph:"/driːm/",         tip:"dream big 心有多大梦有多大", lv:1},
+  {w:"MONEY",   h:"钱（名词）",             ph:"/ˈmʌni/",         tip:"Time is money.", lv:1},
+  {w:"LUCKY",   h:"幸运的（形容词）",       ph:"/ˈlʌki/",         tip:"luck → lucky，Good luck!", lv:1},
+  {w:"PRIZE",   h:"奖品（名词）",           ph:"/praɪz/",         tip:"win a prize 获奖啦", lv:1},
+  {w:"TICKET",  h:"票（名词）",             ph:"/ˈtɪkɪt/",        tip:"a lottery ticket 一张彩票", lv:1},
+  {w:"HAPPY",   h:"快乐的（形容词）",       ph:"/ˈhæpi/",         tip:"happy → happiness", lv:1},
   /* ── ② 进阶 · 6–8 字母 ── */
-  {w:"WINNER",  h:"赢家（名词）",           tip:"be a winner", lv:2},
-  {w:"CHANCE",  h:"机会（名词）",           tip:"a chance to win", lv:2},
-  {w:"BONUS",   h:"奖金（名词）",           tip:"year-end bonus 年终奖", lv:2},
-  {w:"WEALTH",  h:"财富（名词）",           tip:"health is wealth", lv:2},
-  {w:"REWARD",  h:"报答；奖赏（名词）",     tip:"reward → rewarding", lv:2},
-  {w:"FORTUNE", h:"财富；运气（名词）",     tip:"good fortune 好运气", lv:2},
-  {w:"MILLION", h:"百万（数词）",           tip:"one in a million 百里挑一", lv:2},
-  {w:"UNLUCKY", h:"倒霉的（形容词）",       tip:"lucky → unlucky", lv:2},
-  {w:"SUCCESS", h:"成功（名词）",           tip:"success → successful", lv:2},
-  {w:"LOTTERY", h:"彩票（名词）",           tip:"win the lottery 中彩票", lv:2},
-  {w:"JACKPOT", h:"头奖（名词）",           tip:"Hit the jackpot! 中头奖！", lv:2},
-  {w:"DRAWING", h:"抽签（名词）",           tip:"the drawing of lots", lv:2},
-  {w:"WINNING", h:"获胜的（形容词）",       tip:"the winning number 中奖号码", lv:2},
-  {w:"DIAMOND", h:"钻石（名词）",           tip:"diamonds are forever", lv:2},
-  {w:"VICTORY", h:"胜利（名词）",           tip:"V for Victory", lv:2},
-  {w:"TREASURE",h:"宝藏（名词）",           tip:"treasure hunt 寻宝", lv:2},
+  {w:"WINNER",  h:"赢家（名词）",           ph:"/ˈwɪnə(r)/",      tip:"be a winner", lv:2},
+  {w:"CHANCE",  h:"机会（名词）",           ph:"/tʃɑːns/",        tip:"a chance to win", lv:2},
+  {w:"BONUS",   h:"奖金（名词）",           ph:"/ˈbəʊnəs/",       tip:"year-end bonus 年终奖", lv:2},
+  {w:"WEALTH",  h:"财富（名词）",           ph:"/welθ/",          tip:"health is wealth", lv:2},
+  {w:"REWARD",  h:"报答；奖赏（名词）",     ph:"/rɪˈwɔːd/",       tip:"reward → rewarding", lv:2},
+  {w:"FORTUNE", h:"财富；运气（名词）",     ph:"/ˈfɔːtʃuːn/",     tip:"good fortune 好运气", lv:2},
+  {w:"MILLION", h:"百万（数词）",           ph:"/ˈmɪljən/",       tip:"one in a million 百里挑一", lv:2},
+  {w:"UNLUCKY", h:"倒霉的（形容词）",       ph:"/ʌnˈlʌki/",       tip:"lucky → unlucky", lv:2},
+  {w:"SUCCESS", h:"成功（名词）",           ph:"/səkˈses/",       tip:"success → successful", lv:2},
+  {w:"LOTTERY", h:"彩票（名词）",           ph:"/ˈlɒtəri/",       tip:"win the lottery 中彩票", lv:2},
+  {w:"JACKPOT", h:"头奖（名词）",           ph:"/ˈdʒækpɒt/",      tip:"Hit the jackpot! 中头奖！", lv:2},
+  {w:"DRAWING", h:"抽签（名词）",           ph:"/ˈdrɔːɪŋ/",       tip:"the drawing of lots", lv:2},
+  {w:"WINNING", h:"获胜的（形容词）",       ph:"/ˈwɪnɪŋ/",        tip:"the winning number 中奖号码", lv:2},
+  {w:"DIAMOND", h:"钻石（名词）",           ph:"/ˈdaɪəmənd/",     tip:"diamonds are forever", lv:2},
+  {w:"VICTORY", h:"胜利（名词）",           ph:"/ˈvɪktəri/",      tip:"V for Victory", lv:2},
+  {w:"TREASURE",h:"宝藏（名词）",           ph:"/ˈtreʒə(r)/",     tip:"treasure hunt 寻宝", lv:2},
   /* ── ③ 高阶 · 8 字母以上 ── */
-  {w:"BIRTHDAY",   h:"生日（名词）",         tip:"生日号不会更容易中——概率错觉彩蛋", lv:3},
-  {w:"GAMBLING",   h:"赌博（名词）",         tip:"gamble → gambling", lv:3},
-  {w:"STRATEGY",   h:"策略（名词）",         tip:"a winning strategy", lv:3},
-  {w:"CHAMPION",   h:"冠军（名词）",         tip:"win the championship", lv:3},
-  {w:"FORTUNATE",  h:"幸运的（形容词）",     tip:"fortune → fortunately", lv:3},
-  {w:"LUCKILY",    h:"幸运地（副词）",       tip:"Luckily, no one was hurt.", lv:3},
-  {w:"SUPERSTAR",  h:"超级明星（名词）",     tip:"star → superstar", lv:3},
-  {w:"CONFIDENT",  h:"自信的（形容词）",     tip:"be confident of", lv:3},
-  {w:"FANTASTIC",  h:"极好的（形容词）",     tip:"a fantastic prize", lv:3},
-  {w:"MILLIONAIRE",h:"百万富翁（名词）",     tip:"million → millionaire", lv:3},
-  {w:"PROBABILITY",h:"概率（名词）",         tip:"in all probability 十有八九", lv:3},
-  {w:"PSYCHOLOGY", h:"心理学（名词）",       tip:"consumer psychology 消费心理", lv:3},
-  {w:"INCREDIBLE", h:"难以置信的（形容词）", tip:"an incredible story", lv:3},
-  {w:"ENORMOUS",   h:"巨大的（形容词）",     tip:"enormous ≈ huge", lv:3},
+  {w:"BIRTHDAY",   h:"生日（名词）",         ph:"/ˈbɜːθdeɪ/",      tip:"生日号不会更容易中——概率错觉彩蛋", lv:3},
+  {w:"GAMBLING",   h:"赌博（名词）",         ph:"/ˈɡæmblɪŋ/",     tip:"gamble → gambling", lv:3},
+  {w:"STRATEGY",   h:"策略（名词）",         ph:"/ˈstrætədʒi/",   tip:"a winning strategy", lv:3},
+  {w:"CHAMPION",   h:"冠军（名词）",         ph:"/ˈtʃæmpiən/",    tip:"win the championship", lv:3},
+  {w:"FORTUNATE",  h:"幸运的（形容词）",     ph:"/ˈfɔːtʃənət/",   tip:"fortune → fortunately", lv:3},
+  {w:"LUCKILY",    h:"幸运地（副词）",       ph:"/ˈlʌkɪli/",      tip:"Luckily, no one was hurt.", lv:3},
+  {w:"SUPERSTAR",  h:"超级明星（名词）",     ph:"/ˈsuːpəstɑː(r)/", tip:"star → superstar", lv:3},
+  {w:"CONFIDENT",  h:"自信的（形容词）",     ph:"/ˈkɒnfɪdənt/",   tip:"be confident of", lv:3},
+  {w:"FANTASTIC",  h:"极好的（形容词）",     ph:"/fænˈtæstɪk/",   tip:"a fantastic prize", lv:3},
+  {w:"MILLIONAIRE",h:"百万富翁（名词）",     ph:"/ˌmɪljəˈneə(r)/", tip:"million → millionaire", lv:3},
+  {w:"PROBABILITY",h:"概率（名词）",         ph:"/ˌprɒbəˈbɪləti/", tip:"in all probability 十有八九", lv:3},
+  {w:"PSYCHOLOGY", h:"心理学（名词）",       ph:"/saɪˈkɒlədʒi/",   tip:"consumer psychology 消费心理", lv:3},
+  {w:"INCREDIBLE", h:"难以置信的（形容词）", ph:"/ɪnˈkredəbl/",   tip:"an incredible story", lv:3},
+  {w:"ENORMOUS",   h:"巨大的（形容词）",     ph:"/ɪˈnɔːməs/",     tip:"enormous ≈ huge", lv:3},
 ];
 const LEVELS = [
   {id:1, name:"① 基础热身 · 4–6 字母 · 初中基础"},
@@ -473,11 +473,13 @@ function renderMask(){
     wrap.appendChild(d);
   });
   $("#roundTag").textContent = `第 ${state.round} 轮 · 单词 ${state.cur.w.length} 字母 · 开 10 球`;
-  $("#wordHint").textContent = "提示：" + state.cur.h;
-  $("#wordMean").textContent = state.revealed ? state.cur.w + (/[（(]/.test(state.cur.h) ? "  " + state.cur.h : "") : "";
+  $("#wordHint").textContent = "提示：" + state.cur.h + (state.cur.ph ? "　" + state.cur.ph : "");
+  $("#wordMean").textContent = state.revealed
+    ? state.cur.w + (state.cur.h ? "  " + state.cur.h : "") + (state.cur.ph ? "  " + state.cur.ph : "")
+    : "";
   $("#wordSub").textContent = state.revealed
     ? ""
-    : "组内讨论：押 10 个你认为会开出的字母 + 猜完整单词（说英语加分）";
+    : "组内讨论：按顺序填出你预测的 10 个字母（第 1–10 位）+ 猜完整单词（说英语加分）";
   $("#readCmd").textContent = state.revealed ? "Read after me! 全班齐读两遍 · " + state.cur.tip : "";
 }
 function renderBalls(){
